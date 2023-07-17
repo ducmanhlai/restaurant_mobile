@@ -7,7 +7,8 @@ import {
     TouchableOpacity,
     StatusBar
 } from "react-native";
-export default function LoginScreen() {
+import axios from '../services/axios'
+export default function LoginScreen({navigation}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     return (
@@ -32,13 +33,25 @@ export default function LoginScreen() {
             </View>
             <TouchableOpacity>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.loginBtn} onPress= {handleLogin()}>
+            <TouchableOpacity style={styles.loginBtn} onPress= {handleLogin}>
                 <Text style={styles.loginText}>Đăng nhập</Text>
             </TouchableOpacity>
         </View>
     );
     function handleLogin(){
-        
+        (async ()=>{
+           const data= (await axios.post('/api/v1/auth/login',{
+                username:email,
+                password
+            })).data
+          if(data?.accesstoken){
+            
+          }
+        })().catch(err=>{
+            console.log(err)
+        }).finally(()=>{
+            console.log('xong')
+        })
     }
 }
 const styles = StyleSheet.create({
