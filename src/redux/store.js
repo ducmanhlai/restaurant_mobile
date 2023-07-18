@@ -1,12 +1,11 @@
 import { combineReducers, createStore } from "@reduxjs/toolkit";
 import { configureStore } from "@reduxjs/toolkit";
 
-function accesstoken(state = { name: "" }, action){
+function accesstoken(state = { token: "" }, action){
   switch (action.type) {
     case "ADD":
       return {
-        ...state,
-        name: action.data,
+        token: action.data,
       };
     default:
       return state;

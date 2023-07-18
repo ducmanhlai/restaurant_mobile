@@ -7,10 +7,14 @@ import {
     TouchableOpacity,
     StatusBar
 } from "react-native";
-import axios from '../services/axios'
-export default function LoginScreen({navigation}) {
+import axios from '../services/axios';
+import { useSelector, useDispatch } from 'react-redux'
+export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const dispatch = useDispatch();
+    const accesstoken = useSelector((state) => state.accesstoken);
+    if(accesstoken.token.length>0 )navigation.navigate('Home')
     return (
         <View style={styles.container}>
             <StatusBar style="auto" />
@@ -27,7 +31,6 @@ export default function LoginScreen({navigation}) {
                     style={styles.TextInput}
                     placeholder="Mật khẩu"
                     placeholderTextColor="#00000047"
-                    secureTextEntry={true}
                     onChangeText={(password) => setPassword(password)}
                 />
             </View>
@@ -40,17 +43,18 @@ export default function LoginScreen({navigation}) {
     );
     function handleLogin(){
         (async ()=>{
-           const data= (await axios.post('/api/v1/auth/login',{
+              const data= (await axios.post('/api/v1/auth/login',{
                 username:email,
                 password
             })).data
-          if(data?.accesstoken){
-            
+           
+          if(data?.errCode ==0){
+              dispatch({type:'ADD',data:data.accessToken});
+              navigation.navigate('Home')
+          
           }
         })().catch(err=>{
             console.log(err)
-        }).finally(()=>{
-            console.log('xong')
         })
     }
 }
