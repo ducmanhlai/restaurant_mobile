@@ -5,7 +5,8 @@ import {
     View,
     TextInput,
     TouchableOpacity,
-    StatusBar
+    StatusBar,
+    ToastAndroid
 } from "react-native";
 import axios from '../services/axios';
 import { useSelector, useDispatch } from 'react-redux'
@@ -13,8 +14,9 @@ export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const dispatch = useDispatch();
-    const accesstoken = useSelector((state) => state.accesstoken);
+    const [accesstoken,setAccessToken] = useState(useSelector((state) => state.accesstoken));
     if(accesstoken.token.length>0 )navigation.navigate('Home')
+    
     return (
         <View style={styles.container}>
             <StatusBar style="auto" />
@@ -47,11 +49,12 @@ export default function LoginScreen({ navigation }) {
                 username:email,
                 password
             })).data
-           
           if(data?.errCode ==0){
-              dispatch({type:'ADD',data:data.accessToken});
+              dispatch({type:'ADD_TOKEN',data:data.accessToken});
               navigation.navigate('Home')
-          
+          }
+          else{
+            ToastAndroid.showWithGravity('Sai tên đăng nhập hoặc mật khẩu',1500,ToastAndroid.BOTTOM);
           }
         })().catch(err=>{
             console.log(err)
@@ -78,9 +81,9 @@ const styles = StyleSheet.create({
     },
     TextInput: {
         height: 50,
-        flex: 1,
         padding: 10,
         marginLeft: 20,
+        width:'100%'
     },
     loginText: {
         fontWeight: '800',

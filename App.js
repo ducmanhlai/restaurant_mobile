@@ -1,7 +1,6 @@
 // In App.js in a new project
 
 import * as React from 'react';
-import { View, Text } from 'react-native';
 import { Provider } from 'react-redux';
 import Navigaion from './src/screens/Navigation';
 import { store } from './src/redux/store';
@@ -9,7 +8,7 @@ function App() {
   return (
     <Provider store={store}>
       <Navigaion></Navigaion>
-    </Provider>
+    </Provider> 
   );
 }
 
