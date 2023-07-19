@@ -25,14 +25,27 @@ const user = (state = {}, action) => {
     default:
       return state;
   }
-
 };
-
+const listOrder = (state = [], action) => {
+  switch (action.type) {
+    case "INIT_ORDER":
+      return [...action.data]
+    case "ADD_ORDER":
+      return [...state.filter(item=>{
+        return item.id.localeCompare(action.data.id) !=0 
+      }),action.data];
+    case 'REMOVE_ORDER':
+      return []
+    default:
+      return [];
+  }
+};
 
 const store = configureStore({
   reducer: {
     accesstoken,
     user,
+    listOrder
   },
 });
 

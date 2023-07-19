@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, ToastAndroid, StyleSheet } from 'react-native';
+import { View, Text, ToastAndroid, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import baseURL from '../services/const';
@@ -8,10 +8,11 @@ import { connect } from 'react-redux';
 import io from 'socket.io-client';
 function HomeScreen(props) {
   const [socket, setSocket] = useState(io(baseURL));
-  const [listOrder, setListOrder] = useState([])
   const accesstoken = props.accesstoken;
   const user = props.user;
-  const role = user.role
+  const role = user.role;
+  const listOrder = props.listOrder;
+  const sts = 1;
   const dispatch = useDispatch();
   useEffect(() => {
     getUser()
@@ -24,20 +25,18 @@ function HomeScreen(props) {
       socket.on('authenticate', data => {
         console.log(data)
       })
-      socket.on('createOrder', data => {
-        const newList = listOrder.push(data.order)
-        setListOrder(newList)
-        console.log('list',listOrder)
-      })
       socket.emit('getListOrder')
       socket.on('getListOrder', data => {
-        setListOrder([...data])
+        dispatch({ type: 'INIT_ORDER', data: data })
+      })
+      socket.on('createOrder', data => {
+        dispatch({ type: 'ADD_ORDER', data: data.order })
       })
     });
-  }, [])
+  }, [sts])
   return (
     (role == 3 ?
-      <View style={{padding:10}}>
+      <View style={{ padding: 10 }}>
         {
           listOrder.length > 0 ? flatListOrder() : <View><Text>Rỗng</Text></View>
         }
@@ -64,23 +63,30 @@ function HomeScreen(props) {
   }
   function flatListOrder() {
     return (
-      listOrder.map((item, index) => {
-        return (
-          <View key={index} style={styles.itemOrder}>
+      <FlatList
+        style={{ height: '100%' }}
+        data={listOrder}
+        renderItem={({ index, item }) => {
+          return (<TouchableOpacity style={styles.itemOrder}
+            onPress={() => {console.log(item.id)}}
+          >
             <Text>Bàn số: {item.table}</Text>
             <Text></Text>
-          </View>)
-      }
-      ))
+          </TouchableOpacity>)
+        }
+        }
+        keyExtractor={(item) => item.id}
+      />
+    )
   }
 }
 const styles = StyleSheet.create({
-  itemOrder:{
-    width:'100%',
-    height:100,
-    backgroundColor:'#bbffec57',
-    borderRadius:15,
-    padding:10,
+  itemOrder: {
+    width: '100%',
+    height: 100,
+    backgroundColor: '#bbffec57',
+    borderRadius: 15,
+    padding: 10,
 
   }
 })
