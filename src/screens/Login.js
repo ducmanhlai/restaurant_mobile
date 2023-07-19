@@ -5,11 +5,18 @@ import {
     View,
     TextInput,
     TouchableOpacity,
-    StatusBar
+    StatusBar,
+    ToastAndroid
 } from "react-native";
-export default function LoginScreen() {
+import axios from '../services/axios';
+import { useSelector, useDispatch } from 'react-redux'
+export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const dispatch = useDispatch();
+    const [accesstoken,setAccessToken] = useState(useSelector((state) => state.accesstoken));
+    if(accesstoken.token.length>0 )navigation.navigate('Home')
+    
     return (
         <View style={styles.container}>
             <StatusBar style="auto" />
@@ -26,19 +33,32 @@ export default function LoginScreen() {
                     style={styles.TextInput}
                     placeholder="Mật khẩu"
                     placeholderTextColor="#00000047"
-                    secureTextEntry={true}
                     onChangeText={(password) => setPassword(password)}
                 />
             </View>
             <TouchableOpacity>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.loginBtn} onPress= {handleLogin()}>
+            <TouchableOpacity style={styles.loginBtn} onPress= {handleLogin}>
                 <Text style={styles.loginText}>Đăng nhập</Text>
             </TouchableOpacity>
         </View>
     );
     function handleLogin(){
-        
+        (async ()=>{
+              const data= (await axios.post('/api/v1/auth/login',{
+                username:email,
+                password
+            })).data
+          if(data?.errCode ==0){
+              dispatch({type:'ADD_TOKEN',data:data.accessToken});
+              navigation.navigate('Home')
+          }
+          else{
+            ToastAndroid.showWithGravity('Sai tên đăng nhập hoặc mật khẩu',1500,ToastAndroid.BOTTOM);
+          }
+        })().catch(err=>{
+            console.log(err)
+        })
     }
 }
 const styles = StyleSheet.create({
@@ -61,9 +81,9 @@ const styles = StyleSheet.create({
     },
     TextInput: {
         height: 50,
-        flex: 1,
         padding: 10,
         marginLeft: 20,
+        width:'100%'
     },
     loginText: {
         fontWeight: '800',
