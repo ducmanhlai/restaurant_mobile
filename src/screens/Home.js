@@ -6,33 +6,39 @@ import baseURL from '../services/const';
 import axios from '../services/axios';
 import { connect } from 'react-redux';
 import io from 'socket.io-client';
+import Icon from 'react-native-vector-icons/dist/FontAwesome';
 function HomeScreen(props) {
-  const [socket, setSocket] = useState(io(baseURL));
+  const navigation =props.navigation
   const accesstoken = props.accesstoken;
   const user = props.user;
-  const role = user.role;
+  // const role = user.role;
+  const role = 3
   const listOrder = props.listOrder;
   const sts = 1;
   const dispatch = useDispatch();
   useEffect(() => {
-    getUser()
+    // getUser()
+    const socket = io(baseURL)
     socket.on('connect', function () {
-      console.log('call')
-      socket.emit('authenticate', { token: accesstoken.token });
+      // socket.emit('authenticate', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcl9uYW1lIjoibmhhbnZpZW4xIiwicGFzc3dvcmQiOiIkMmIkMTAkWVFGRjRZcnpTc0tHMzVJNnpZb2tST1A3em50akZPUjZwc2Uya2J1T2g5a0luamZDd2FPZFciLCJyb2xlIjozLCJsb2NrIjowLCJpYXQiOjE2ODk4NDYxNzEsImV4cCI6MTY4OTg2NDE3MX0.U42IXmzEeaSarhLzhZU1i0z0sK3sVTVd32KcLKGDBz8' });
       socket.on('err', (err) => {
         ToastAndroid.show('Lỗi')
       })
       socket.on('authenticate', data => {
         console.log(data)
       })
-      socket.emit('getListOrder')
-      socket.on('getListOrder', data => {
-        dispatch({ type: 'INIT_ORDER', data: data })
-      })
-      socket.on('createOrder', data => {
-        dispatch({ type: 'ADD_ORDER', data: data.order })
-      })
     });
+    socket.on('createOrder', data => {
+      dispatch({ type: 'ADD_ORDER', data: data.order })
+    })
+    socket.emit('getListOrder')
+    socket.on('getListOrder', data => {
+      dispatch({ type: 'INIT_ORDER', data: data })
+    })
+
+    return () => {
+      socket.disconnect()
+    }
   }, [sts])
   return (
     (role == 3 ?
@@ -40,6 +46,11 @@ function HomeScreen(props) {
         {
           listOrder.length > 0 ? flatListOrder() : <View><Text>Rỗng</Text></View>
         }
+        <View style={{ position: 'absolute', right: 10, top: 700 }}>
+          <TouchableOpacity style={styles.btnAdd} onPress={()=>navigation.navigate('ManageOrder')}>
+            <Icon name="plus" size={40} color="white" />
+          </TouchableOpacity>
+        </View>
       </View>
       : <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Text>Bếp</Text>
@@ -59,8 +70,6 @@ function HomeScreen(props) {
       ToastAndroid.show('Có lỗi xảy ra')
     })
   }
-  function getFood() {
-  }
   function flatListOrder() {
     return (
       <FlatList
@@ -68,7 +77,7 @@ function HomeScreen(props) {
         data={listOrder}
         renderItem={({ index, item }) => {
           return (<TouchableOpacity style={styles.itemOrder}
-            onPress={() => {console.log(item.id)}}
+            onPress={() => { console.log(item.id) }}
           >
             <Text>Bàn số: {item.table}</Text>
             <Text></Text>
@@ -87,7 +96,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#bbffec57',
     borderRadius: 15,
     padding: 10,
-
+  },
+  btnAdd: {
+    flexDirection: 'row',
+    backgroundColor: '#0080ff',
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    borderRadius: 30,
+    justifyContent: 'center'
   }
 })
 export default connect(state => {
