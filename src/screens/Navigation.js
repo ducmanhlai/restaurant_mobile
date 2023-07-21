@@ -11,8 +11,8 @@ function Navigaion() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name='ManageOrder' component={ManageOrder}/>
         <Stack.Screen name='Login' component={LoginScreen}/>
-        <Stack.Screen name= 'ManageOrder' component={ManageOrder}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
