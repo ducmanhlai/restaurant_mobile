@@ -26,6 +26,16 @@ const user = (state = {}, action) => {
       return state;
   }
 };
+const listFood = (state = [], action) => {
+  switch (action.type) {
+    case "INIT_LIST_FOOD":
+      return [...action.data]
+    case 'REMOVE_LIST_FOOD':
+      return []
+    default:
+      return state;
+  }
+};
 const listOrder = (state = [], action) => {
   switch (action.type) {
     case "INIT_ORDER":
@@ -45,7 +55,8 @@ const store = configureStore({
   reducer: {
     accesstoken,
     user,
-    listOrder
+    listOrder,
+    listFood
   },
 });
 

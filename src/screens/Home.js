@@ -18,6 +18,12 @@ function HomeScreen(props) {
   const dispatch = useDispatch();
   useEffect(() => {
     // getUser()
+    (async ()=>{
+      const data = (await axios.get('/api/v1/food/get')).data.data
+      dispatch({type:'INIT_LIST_FOOD',data:data})
+    })().catch(err=>{
+      console.log(err)
+    })
     const socket = io(baseURL)
     socket.on('connect', function () {
       // socket.emit('authenticate', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcl9uYW1lIjoibmhhbnZpZW4xIiwicGFzc3dvcmQiOiIkMmIkMTAkWVFGRjRZcnpTc0tHMzVJNnpZb2tST1A3em50akZPUjZwc2Uya2J1T2g5a0luamZDd2FPZFciLCJyb2xlIjozLCJsb2NrIjowLCJpYXQiOjE2ODk4NDYxNzEsImV4cCI6MTY4OTg2NDE3MX0.U42IXmzEeaSarhLzhZU1i0z0sK3sVTVd32KcLKGDBz8' });
@@ -35,7 +41,7 @@ function HomeScreen(props) {
     socket.on('getListOrder', data => {
       dispatch({ type: 'INIT_ORDER', data: data })
     })
-
+   
     return () => {
       socket.disconnect()
     }
@@ -77,7 +83,7 @@ function HomeScreen(props) {
         data={listOrder}
         renderItem={({ index, item }) => {
           return (<TouchableOpacity style={styles.itemOrder}
-            onPress={() => { console.log(item.id) }}
+            onPress={() => { navigation.navigate('OrderDetail',{order: item}) }}
           >
             <Text>Bàn số: {item.table}</Text>
             <Text></Text>

@@ -68,7 +68,6 @@ function ManageOrder(props) {
         }
       }, [sts])
     return (
-
         <View style={{ height: '100%', width: '100%', backgroundColor: '#f7f7f773' }}>
             <View style={{ flexDirection: 'row', width: '100%', marginTop: 10 }}>
                 <DropDownPicker
@@ -94,7 +93,6 @@ function ManageOrder(props) {
             <View>
                 {listFood.length > 0 ? renderListFood() : <View><Text>Đang tải</Text></View>}
             </View>
-
             <View style={{ flexDirection: 'column', alignItems: 'center',flex: 1,}}
             >
                 <TextInput
@@ -102,8 +100,7 @@ function ManageOrder(props) {
                     value={note}
                     onChangeText={(text) => setNote(text)}
                     style={[{height:90,width:'90%',marginVertical:10},styles.textInputNote]}
-                ></TextInput>
-                
+                ></TextInput>         
                 <TouchableOpacity
                     onPress={() => {
                         handleOrder();
