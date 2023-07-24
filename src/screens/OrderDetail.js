@@ -2,24 +2,22 @@ import React, { useEffect, useState } from "react";
 import {
     FlatList,
     Image,
+    Modal,
     StyleSheet,
     Text,
-    TextInput,
     TouchableOpacity,
     View
 } from "react-native";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useSelector, useDispatch } from 'react-redux';
 import { connect } from "react-redux";
-import DropDownPicker from 'react-native-dropdown-picker';
-import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import io from 'socket.io-client';
-import axios from '../services/axios';
 import baseURL from "../services/const";
+import moment from "moment/moment";
 function OrderDetail(props) {
     const navigation = props.navigation;
     const listOrder = props.listOrder;
-    const listFood = props.listFood
+    const listFood = props.listFood;
+    const [modalVisible, setModalVisible] = useState(false);
     const [order, setOrder] = useState(props.route.params.order)
     const socket = io(baseURL)
     const sts = 1;
@@ -47,18 +45,28 @@ function OrderDetail(props) {
     }, [sts])
     return (
         <View style={{ height: '100%', width: '100%', backgroundColor: '#f7f7f773' }}>
+            <Modal animationType="slide" visible={modalVisible}></Modal>
+            <View style={{ backgroundColor: 'white', zIndex: 1, minHeight: '10%', justifyContent: 'space-evenly' }}>
+                <Text style={{ color: 'black' }}>Bàn số: {order.table}</Text>
+                <Text style={{ color: 'black' }}>Giờ tạo: {moment(order.time).format("HH:mm DD/MM/YYYY")}</Text>
+                <Text style={{ color: 'black' }}>Tổng tiền: {50000}</Text>
+            </View>
             <FlatList
-                style={{ maxHeight: '80%', backgroundColor: 'white', marginTop: 10, paddingRight: 10 }}
+                style={{ maxHeight: '80%', backgroundColor: 'white', paddingRight: 10, position: 'relative', zIndex: 1 }}
                 data={order.detail}
                 renderItem={itemFood}
                 keyExtractor={(item) => item.id}
+                contentContainerStyle={{
+                    flexGrow: 1,
+                }}
             />
-            <View style={{ minHeight: '20%', width: '100%', alignItems:'center',flexDirection:'row',marginHorizontal:10 }}>
-            <TouchableOpacity style={{ height: '30%', backgroundColor: '#ed2222', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}><Text style={{ fontSize: 18, color: 'white',fontWeight:'700' }}>Hủy</Text></TouchableOpacity>
-            <TouchableOpacity style={{ height: '30%', backgroundColor: '#00ecff99', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}><Text style={{ fontSize: 18, color: 'white',fontWeight:'700'  }}>Cập nhật</Text></TouchableOpacity>
+            <View style={{ minHeight: '20%', width: '100%', alignItems: 'center', flexDirection: 'row', marginHorizontal: 10, position: 'relative', zIndex: 2 }}>
+                <TouchableOpacity style={{ height: '30%', backgroundColor: '#ed2222', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}><Text style={{ fontSize: 18, color: 'white', fontWeight: '700' }}>Quay lại</Text></TouchableOpacity>
+                <TouchableOpacity style={{ height: '30%', backgroundColor: '#00ecff99', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}><Text style={{ fontSize: 18, color: 'white', fontWeight: '700' }}>Xác nhận</Text></TouchableOpacity>
             </View>
         </View>
     );
+    
     function itemFood({ index, item }) {
         let food = getDetailFood(item.id)
         return (

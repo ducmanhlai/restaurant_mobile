@@ -19,6 +19,7 @@ import baseURL from "../services/const";
 function ManageOrder(props) {
     const navigation = props.navigation;
     const listOrder = props.listOrder;
+    const order = props.route.params?.order || null;
     const [listTable, setListTable] = useState([])
     const [listTypeFood, setListTypeFood] = useState([])
     const [id_staff, setId_staff] = useState(1);
@@ -29,7 +30,7 @@ function ManageOrder(props) {
     const [listDetail, setListDetail] = useState([]);
     const [openTable, setOpenTable] = useState(false);
     const [openTypeFood, setOpenTypeFood] = useState(false);
-    const socket=  io(baseURL)
+    const socket = io(baseURL)
     const sts = 1;
     const dispatch = useDispatch();
     let VietNamDong = new Intl.NumberFormat('vi-VN', {
@@ -51,22 +52,38 @@ function ManageOrder(props) {
             }
             setListTable([...listTmp])
         })()
+        let listTmp = [...listFood]
+        setTable(order.table)
+        if (order != null) {
+            const mapIdToItem = listTmp.reduce((acc, item) => {
+                acc[item.id] = item;
+                return acc;
+            }, {});
+            // Cập nhật giá trị "quantity" trong danh sách thứ hai dựa trên danh sách thứ nhất
+            order.detail.forEach(item => {
+                const itemId = item.id;
+                if (mapIdToItem[itemId]) {
+                    mapIdToItem[itemId].quantity = item.quantity;
+                }
+            });
+        }
+        setListFood([...listTmp])
     }, [])
     useEffect(() => {
         // getUser()
         socket.on('connect', function () {
-          // socket.emit('authenticate', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcl9uYW1lIjoibmhhbnZpZW4xIiwicGFzc3dvcmQiOiIkMmIkMTAkWVFGRjRZcnpTc0tHMzVJNnpZb2tST1A3em50akZPUjZwc2Uya2J1T2g5a0luamZDd2FPZFciLCJyb2xlIjozLCJsb2NrIjowLCJpYXQiOjE2ODk4NDYxNzEsImV4cCI6MTY4OTg2NDE3MX0.U42IXmzEeaSarhLzhZU1i0z0sK3sVTVd32KcLKGDBz8' });
-          socket.on('err', (err) => {
-            ToastAndroid.show('Lỗi')
-          })
-          socket.on('authenticate', data => {
-            console.log(data)
-          })
+            // socket.emit('authenticate', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcl9uYW1lIjoibmhhbnZpZW4xIiwicGFzc3dvcmQiOiIkMmIkMTAkWVFGRjRZcnpTc0tHMzVJNnpZb2tST1A3em50akZPUjZwc2Uya2J1T2g5a0luamZDd2FPZFciLCJyb2xlIjozLCJsb2NrIjowLCJpYXQiOjE2ODk4NDYxNzEsImV4cCI6MTY4OTg2NDE3MX0.U42IXmzEeaSarhLzhZU1i0z0sK3sVTVd32KcLKGDBz8' });
+            socket.on('err', (err) => {
+                ToastAndroid.show('Lỗi')
+            })
+            socket.on('authenticate', data => {
+                console.log(data)
+            })
         });
         return () => {
-          socket.disconnect()
+            socket.disconnect()
         }
-      }, [sts])
+    }, [sts])
     return (
         <View style={{ height: '100%', width: '100%', backgroundColor: '#f7f7f773' }}>
             <View style={{ flexDirection: 'row', width: '100%', marginTop: 10 }}>
@@ -93,14 +110,14 @@ function ManageOrder(props) {
             <View>
                 {listFood.length > 0 ? renderListFood() : <View><Text>Đang tải</Text></View>}
             </View>
-            <View style={{ flexDirection: 'column', alignItems: 'center',flex: 1,}}
+            <View style={{ flexDirection: 'column', alignItems: 'center', flex: 1, }}
             >
                 <TextInput
                     placeholder="Ghi chú..."
                     value={note}
                     onChangeText={(text) => setNote(text)}
-                    style={[{height:90,width:'90%',marginVertical:10},styles.textInputNote]}
-                ></TextInput>         
+                    style={[{ height: 90, width: '90%', marginVertical: 10 }, styles.textInputNote]}
+                ></TextInput>
                 <TouchableOpacity
                     onPress={() => {
                         handleOrder();
@@ -116,12 +133,31 @@ function ManageOrder(props) {
     );
     function getListFood() {
         (async () => {
-            const data = (await axios.get('/api/v1/food/get')).data.data
-            setListFood([...data.map(item => {
+            let data = (await axios.get('/api/v1/food/get')).data.data;
+            setTable(order.table)
+            data = [...data.map(item => {
                 return { ...item, quantity: 0 }
-            })])
-        })()
+            })]
+            if (order != null) {
+                const mapIdToItem = data.reduce((acc, item) => {
+                    acc[item.id] = item;
+                    return acc;
+                }, {});
+                // Cập nhật giá trị "quantity" trong danh sách thứ hai dựa trên danh sách thứ nhất
+                order.detail.forEach(item => {
+                    const itemId = item.id;
+                    if (mapIdToItem[itemId]) {
+                        mapIdToItem[itemId].quantity = item.quantity;
+                    }
+                });
+            }
+            setListFood([...data])
+
+        })().catch(err => {
+            console.log(err)
+        })
     }
+
     function renderListFood() {
         return (
             <FlatList
@@ -167,16 +203,17 @@ function ManageOrder(props) {
         }))
     }
     function handleOrder() {
-      let data = {
-        id_staff,
-        note:note,
-        table,
-        detail:[...listFood.filter(item=>{
-            return  item.quantity>0
-        })]
-      }
-      socket.emit('createOrder',data)
-      navigation.navigate('Home')
+        let data = {
+            id_staff,
+            note: note,
+            table,
+            detail: [...listFood.filter(item => {
+                return item.quantity > 0
+            })]
+        }
+        console.log(data)
+        // socket.emit('createOrder', data)
+        // navigation.navigate('Home')
     }
 }
 

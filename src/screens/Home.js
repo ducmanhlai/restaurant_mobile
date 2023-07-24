@@ -2,26 +2,29 @@ import * as React from 'react';
 import { View, Text, ToastAndroid, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import baseURL from '../services/const';
-import axios from '../services/axios';
 import { connect } from 'react-redux';
 import io from 'socket.io-client';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import moment from 'moment';
+import baseURL from '../services/const';
+import axios from '../services/axios';
 function HomeScreen(props) {
-  const navigation =props.navigation
+  const navigation = props.navigation
   const accesstoken = props.accesstoken;
   const user = props.user;
   // const role = user.role;
+  const [enable, setEnable] = useState(true)
+  const [listStatus,setListStatus]= useState(['Đã nhận','Đã hoàn thành', 'Đã hủy'])
   const role = 3
   const listOrder = props.listOrder;
   const sts = 1;
   const dispatch = useDispatch();
   useEffect(() => {
     // getUser()
-    (async ()=>{
+    (async () => {
       const data = (await axios.get('/api/v1/food/get')).data.data
-      dispatch({type:'INIT_LIST_FOOD',data:data})
-    })().catch(err=>{
+      dispatch({ type: 'INIT_LIST_FOOD', data: data })
+    })().catch(err => {
       console.log(err)
     })
     const socket = io(baseURL)
@@ -41,7 +44,7 @@ function HomeScreen(props) {
     socket.on('getListOrder', data => {
       dispatch({ type: 'INIT_ORDER', data: data })
     })
-   
+
     return () => {
       socket.disconnect()
     }
@@ -53,7 +56,7 @@ function HomeScreen(props) {
           listOrder.length > 0 ? flatListOrder() : <View><Text>Rỗng</Text></View>
         }
         <View style={{ position: 'absolute', right: 10, top: 700 }}>
-          <TouchableOpacity style={styles.btnAdd} onPress={()=>navigation.navigate('ManageOrder')}>
+          <TouchableOpacity style={styles.btnAdd} onPress={() => navigation.navigate('ManageOrder')}>
             <Icon name="plus" size={40} color="white" />
           </TouchableOpacity>
         </View>
@@ -82,12 +85,36 @@ function HomeScreen(props) {
         style={{ height: '100%' }}
         data={listOrder}
         renderItem={({ index, item }) => {
-          return (<TouchableOpacity style={styles.itemOrder}
-            onPress={() => { navigation.navigate('OrderDetail',{order: item}) }}
-          >
-            <Text>Bàn số: {item.table}</Text>
-            <Text></Text>
-          </TouchableOpacity>)
+          let total = 0;
+          for (let i of item.detail) {
+            total += i.price * i.quantity
+          }
+          
+          return (
+            <View style={styles.itemOrder}>
+              <View style={{ flex: 8 }}>
+                <Text style={styles.textItem}>Bàn số: {item.table}</Text>
+                <Text style={styles.textItem}>Thời gian: {moment(item.time).format("HH:mm DD/MM/YYYY")}</Text>
+                <Text style={styles.textItem}>Trạng thái: {listStatus[item.status-1]}</Text>
+                <Text style={styles.textItem}>Thành tiền: {total.toLocaleString('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND',
+                })}</Text>
+              </View>
+              <View>
+                <TouchableOpacity style={styles.btnItem}
+                  onPress={() => { navigation.navigate('OrderDetail', { order: item }) }}
+                >
+                  <Text>Tính tiền</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={item.status==1 ? styles.btnItem : [styles.btnItem,{backgroundColor:'black'}]}
+                  onPress={item.status==1 ? () => { navigation.navigate('ManageOrder', { order: item }) }: null}
+                >
+                  <Text>Sửa</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )
         }
         }
         keyExtractor={(item) => item.id}
@@ -97,11 +124,19 @@ function HomeScreen(props) {
 }
 const styles = StyleSheet.create({
   itemOrder: {
+    flexDirection: 'row',
     width: '100%',
-    height: 100,
-    backgroundColor: '#bbffec57',
-    borderRadius: 15,
-    padding: 10,
+    height: 150,
+    backgroundColor: 'white',
+    padding: 15,
+    marginBottom: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    // Đảm bảo sử dụng elevation trên Android để có hiệu ứng đổ bóng tương tự.
+    elevation: 4,
   },
   btnAdd: {
     flexDirection: 'row',
@@ -111,7 +146,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 30,
     justifyContent: 'center'
-  }
+  },
+  textItem:{
+    color:'black',
+    fontSize:18,
+    marginBottom:5
+  },
+  btnItem: { flex: 2, backgroundColor: '#00ecff99', width: 80, height: 40, marginBottom: 10, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }
 })
 export default connect(state => {
   return state
