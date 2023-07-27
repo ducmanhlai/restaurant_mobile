@@ -19,6 +19,7 @@ function OrderDetail(props) {
     const listFood = props.listFood;
     const [modalVisible, setModalVisible] = useState(false);
     const [order, setOrder] = useState(props.route.params.order)
+   
     const socket = io(baseURL)
     const sts = 1;
     const dispatch = useDispatch();
@@ -68,11 +69,12 @@ function OrderDetail(props) {
     );
     
     function itemFood({ index, item }) {
-        let food = getDetailFood(item.id)
+        let food = getDetailFood(item.id_food)
+        console.log(food)
         return (
             <View style={{ height: 100, width: '100%', backgroundColor: '#bbffec57', margin: 10, borderRadius: 20, alignItems: 'center', flexDirection: 'row' }}>
                 <Image source={{
-                    uri: food.avatar,
+                    uri: food?.avatar,
                 }}
                     style={{ height: 80, flex: 2, margin: 10, borderRadius: 20 }}
                 ></Image>

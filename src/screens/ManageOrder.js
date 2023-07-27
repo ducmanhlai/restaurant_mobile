@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import {
     FlatList,
     Image,
+    Modal,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View
 } from "react-native";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useSelector, useDispatch } from 'react-redux';
 import { connect } from "react-redux";
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -24,12 +24,13 @@ function ManageOrder(props) {
     const [listTypeFood, setListTypeFood] = useState([])
     const [id_staff, setId_staff] = useState(1);
     const [listFood, setListFood] = useState([])
-    const [table, setTable] = useState(0);
+    const [table, setTable] = useState(1);
     const [typeFood, setTypeFood] = useState(0);
     const [note, setNote] = useState('');
-    const [listDetail, setListDetail] = useState([]);
+    const [listDetail, setListDetail] = useState(props.route.params?.order.detail || []);
     const [openTable, setOpenTable] = useState(false);
     const [openTypeFood, setOpenTypeFood] = useState(false);
+    const [openModal, setOpenModal] = useState(false)
     const socket = io(baseURL)
     const sts = 1;
     const dispatch = useDispatch();
@@ -52,22 +53,6 @@ function ManageOrder(props) {
             }
             setListTable([...listTmp])
         })()
-        let listTmp = [...listFood]
-        setTable(order.table)
-        if (order != null) {
-            const mapIdToItem = listTmp.reduce((acc, item) => {
-                acc[item.id] = item;
-                return acc;
-            }, {});
-            // Cập nhật giá trị "quantity" trong danh sách thứ hai dựa trên danh sách thứ nhất
-            order.detail.forEach(item => {
-                const itemId = item.id;
-                if (mapIdToItem[itemId]) {
-                    mapIdToItem[itemId].quantity = item.quantity;
-                }
-            });
-        }
-        setListFood([...listTmp])
     }, [])
     useEffect(() => {
         // getUser()
@@ -86,27 +71,49 @@ function ManageOrder(props) {
     }, [sts])
     return (
         <View style={{ height: '100%', width: '100%', backgroundColor: '#f7f7f773' }}>
+            <Modal visible={openModal} style={{
+               margin: 20,
+               backgroundColor: 'black',
+               borderRadius: 20,
+               padding: 35,
+               minHeight:100,
+               minWidth:100,
+               alignItems: 'center',
+               shadowColor: '#000',
+               shadowOffset: {
+                 width: 0,
+                 height: 2,
+               },
+               shadowOpacity: 0.25,
+               shadowRadius: 4,
+               elevation: 5,
+            }} onRequestClose={() => setOpenModal(false)}
+                animationType="slide"
+                // transparent={true}
+                >
+            </Modal>
             <View style={{ flexDirection: 'row', width: '100%', marginTop: 10 }}>
-                <DropDownPicker
-                    placeholder={table == 0 ? 'Chọn bàn' : `Bàn số ${table}`}
-                    setOpen={() => { setOpenTable(!openTable) }}
-                    multiple={false}
-                    items={listTable}
-                    open={openTable}
-                    setValue={setTable}
-                    style={{ width: '40%', left: 10 }}
-                />
-                <DropDownPicker
-                    style={{ width: '40%', right: 170 }}
-                    placeholder={'Chọn loại'}
-                    setOpen={() => { setOpenTypeFood(!openTypeFood) }}
-                    multiple={false}
-                    items={listTypeFood}
-                    open={openTypeFood}
-                    setValue={setTypeFood}
-                ></DropDownPicker>
+                <View style={{ flexDirection: 'row', flex: 9, marginTop: 10 }}>
+                    <DropDownPicker
+                        placeholder={table == 0 ? 'Chọn bàn' : `Bàn số ${table}`}
+                        setOpen={() => { setOpenTable(!openTable) }}
+                        multiple={false}
+                        items={listTable}
+                        open={openTable}
+                        setValue={setTable}
+                        style={{ width: '40%', left: 10 }}
+                    />
+                    <DropDownPicker
+                        style={{ width: '40%', right: 170 }}
+                        placeholder={'Chọn loại'}
+                        setOpen={() => { setOpenTypeFood(!openTypeFood) }}
+                        multiple={false}
+                        items={listTypeFood}
+                        open={openTypeFood}
+                        setValue={setTypeFood}
+                    ></DropDownPicker></View>
+                <View style={{ flexDirection: 'row', flex: 1, marginTop: 10 }}><TouchableOpacity style={{ width: '100%', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }} onPress={() => { setOpenModal(!openModal) }} ><Icon name="th-list" size={25} color={'black'}></Icon></TouchableOpacity></View>
             </View>
-
             <View>
                 {listFood.length > 0 ? renderListFood() : <View><Text>Đang tải</Text></View>}
             </View>
@@ -124,33 +131,17 @@ function ManageOrder(props) {
                     }}
                     style={[styles.textInputNote, { backgroundColor: '#00ecff99' }]}
                 >
-                    <Text>Tạo order</Text>
+                    <Text>{order != null ? 'Chỉnh sửa' : 'Tạo order'}</Text>
                 </TouchableOpacity>
             </View>
         </View>
-
-
     );
     function getListFood() {
         (async () => {
             let data = (await axios.get('/api/v1/food/get')).data.data;
-            setTable(order.table)
             data = [...data.map(item => {
                 return { ...item, quantity: 0 }
             })]
-            if (order != null) {
-                const mapIdToItem = data.reduce((acc, item) => {
-                    acc[item.id] = item;
-                    return acc;
-                }, {});
-                // Cập nhật giá trị "quantity" trong danh sách thứ hai dựa trên danh sách thứ nhất
-                order.detail.forEach(item => {
-                    const itemId = item.id;
-                    if (mapIdToItem[itemId]) {
-                        mapIdToItem[itemId].quantity = item.quantity;
-                    }
-                });
-            }
             setListFood([...data])
 
         })().catch(err => {
@@ -204,16 +195,26 @@ function ManageOrder(props) {
     }
     function handleOrder() {
         let data = {
-            id_staff,
-            note: note,
-            table,
+            id: order != null ? order.id : null,
+            table: table,
             detail: [...listFood.filter(item => {
                 return item.quantity > 0
+            }).map(item => {
+                return {
+                    ...item,
+                    id_food: item.id
+                }
             })]
         }
-        console.log(data)
-        // socket.emit('createOrder', data)
-        // navigation.navigate('Home')
+        if (order != null) {
+            socket.emit('updateOrderDetail', data)
+            navigation.navigate('Home')
+        }
+        else {
+            socket.emit('createOrder', data)
+            navigation.navigate('Home')
+        }
+
     }
 }
 
