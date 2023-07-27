@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
     FlatList,
     Image,
-    Modal,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
+    DrawerLayoutAndroid,
 } from "react-native";
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { connect } from "react-redux";
 import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import { formatCurrency } from "../common";
 import io from 'socket.io-client';
 import axios from '../services/axios';
 import baseURL from "../services/const";
@@ -27,10 +28,10 @@ function ManageOrder(props) {
     const [table, setTable] = useState(1);
     const [typeFood, setTypeFood] = useState(0);
     const [note, setNote] = useState('');
-    const [listDetail, setListDetail] = useState(props.route.params?.order.detail || []);
+    const [listDetail, setListDetail] = useState();
     const [openTable, setOpenTable] = useState(false);
     const [openTypeFood, setOpenTypeFood] = useState(false);
-    const [openModal, setOpenModal] = useState(false)
+    const drawer = useRef(null);
     const socket = io(baseURL)
     const sts = 1;
     const dispatch = useDispatch();
@@ -70,30 +71,13 @@ function ManageOrder(props) {
         }
     }, [sts])
     return (
-        <View style={{ height: '100%', width: '100%', backgroundColor: '#f7f7f773' }}>
-            <Modal visible={openModal} style={{
-               margin: 20,
-               backgroundColor: 'black',
-               borderRadius: 20,
-               padding: 35,
-               minHeight:100,
-               minWidth:100,
-               alignItems: 'center',
-               shadowColor: '#000',
-               shadowOffset: {
-                 width: 0,
-                 height: 2,
-               },
-               shadowOpacity: 0.25,
-               shadowRadius: 4,
-               elevation: 5,
-            }} onRequestClose={() => setOpenModal(false)}
-                animationType="slide"
-                // transparent={true}
-                >
-            </Modal>
-            <View style={{ flexDirection: 'row', width: '100%', marginTop: 10 }}>
-                <View style={{ flexDirection: 'row', flex: 9, marginTop: 10 }}>
+        <DrawerLayoutAndroid
+            ref={drawer}
+            drawerWidth={300}
+            drawerPosition={'right'}
+            renderNavigationView={navigationView}>
+            <View style={{ backgroundColor: '#f7f7f773', flex: 1, }}>
+                <View style={{ flexDirection: 'row', width: '100%', marginTop: 10 }}>
                     <DropDownPicker
                         placeholder={table == 0 ? 'Chọn bàn' : `Bàn số ${table}`}
                         setOpen={() => { setOpenTable(!openTable) }}
@@ -104,37 +88,38 @@ function ManageOrder(props) {
                         style={{ width: '40%', left: 10 }}
                     />
                     <DropDownPicker
-                        style={{ width: '40%', right: 170 }}
+                        style={{ width: '40%', right: 200 }}
                         placeholder={'Chọn loại'}
                         setOpen={() => { setOpenTypeFood(!openTypeFood) }}
                         multiple={false}
                         items={listTypeFood}
                         open={openTypeFood}
                         setValue={setTypeFood}
-                    ></DropDownPicker></View>
-                <View style={{ flexDirection: 'row', flex: 1, marginTop: 10 }}><TouchableOpacity style={{ width: '100%', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }} onPress={() => { setOpenModal(!openModal) }} ><Icon name="th-list" size={25} color={'black'}></Icon></TouchableOpacity></View>
-            </View>
-            <View>
-                {listFood.length > 0 ? renderListFood() : <View><Text>Đang tải</Text></View>}
-            </View>
-            <View style={{ flexDirection: 'column', alignItems: 'center', flex: 1, }}
-            >
-                <TextInput
-                    placeholder="Ghi chú..."
-                    value={note}
-                    onChangeText={(text) => setNote(text)}
-                    style={[{ height: 90, width: '90%', marginVertical: 10 }, styles.textInputNote]}
-                ></TextInput>
-                <TouchableOpacity
-                    onPress={() => {
-                        handleOrder();
-                    }}
-                    style={[styles.textInputNote, { backgroundColor: '#00ecff99' }]}
+                    ></DropDownPicker>
+                </View>
+                <View>
+                    {listFood.length > 0 ? renderListFood() : <View><Text>Đang tải</Text></View>}
+                </View>
+                <View style={{ flexDirection: 'column', alignItems: 'center', flex: 1, }}
                 >
-                    <Text>{order != null ? 'Chỉnh sửa' : 'Tạo order'}</Text>
-                </TouchableOpacity>
+                    <TextInput
+                        placeholder="Ghi chú..."
+                        value={note}
+                        onChangeText={(text) => setNote(text)}
+                        style={[{ height: 90, width: '90%', marginVertical: 10 }, styles.textInputNote]}
+                    ></TextInput>
+                    <TouchableOpacity
+                        onPress={() => {
+                            handleOrder();
+                        }}
+                        style={[styles.textInputNote, { backgroundColor: '#00ecff99' }]}
+                    >
+                        <Text>{order != null ? 'Chỉnh sửa' : 'Tạo order'}</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-        </View>
+            <TouchableOpacity style={{ position: 'absolute', right: 10, top: 25 }} onPress={() => drawer.current.openDrawer()}><Icon name="list-ul" size={20} color='black'></Icon></TouchableOpacity>
+        </DrawerLayoutAndroid>
     );
     function getListFood() {
         (async () => {
@@ -143,12 +128,11 @@ function ManageOrder(props) {
                 return { ...item, quantity: 0 }
             })]
             setListFood([...data])
-
+            setListDetail(props.route.params?.order.detail || [])
         })().catch(err => {
             console.log(err)
         })
     }
-
     function renderListFood() {
         return (
             <FlatList
@@ -178,8 +162,58 @@ function ManageOrder(props) {
                             <Icon name='plus-circle' size={30} color={'#1ee913c9'} />
                         </TouchableOpacity>
                     </View>
-                    <Text>{VietNamDong.format(item.price)}</Text>
+                    <Text>{formatCurrency(item.price)}</Text>
                 </View>
+            </View>
+        )
+    }
+    function itemOrder({ index, item }) {
+        let food = getDetailFood(item.id_food)
+        return (
+            <View style={{ height: 100, width: '100%', backgroundColor: '#bbffec57', margin: 10, borderRadius: 20, alignItems: 'center', flexDirection: 'row' }}>
+                <Image source={{
+                    uri: food?.avatar,
+                }}
+                    style={{ height: 80, flex: 2, margin: 10, borderRadius: 20 }}
+                ></Image>
+                <View style={{ flex: 3 }}>
+                    <Text>{food.name}</Text>
+                    <Text>{VietNamDong.format(item.price)}</Text>
+                    <View style={{ flexDirection: 'row' }}>
+                        <Text style={{ paddingTop: 1, }}>Số lượng: </Text>
+                        <Text style={{ marginLeft: 3, paddingTop: 1, }}>{item.quantity}</Text>
+                    </View>
+                </View>
+                <TouchableOpacity
+                    onPress={() => {
+                        socket.emit('updateStatusDetail', {
+                            "id": item.id,
+                            "status": 3
+                        })
+                    }}
+                    style={{ height: '50%', backgroundColor: '#ed2222', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}>
+                    <Text style={{ fontSize: 18, color: 'white' }}>Hủy</Text>
+                </TouchableOpacity>
+            </View>
+        )
+    }
+    function getDetailFood(id) {
+        for (let i of listFood) {
+            if (i.id == id) {
+                return i
+            }
+        }
+    }
+    function navigationView() {
+        return (
+            <View >
+                <FlatList
+                    data={listDetail}
+                    renderItem={itemOrder}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{
+                    }}
+                />
             </View>
         )
     }
@@ -236,7 +270,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.2,
         shadowRadius: 4,
-        elevation: 4, // For Android shadow
+        elevation: 4,
     },
 });
 

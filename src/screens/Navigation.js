@@ -16,25 +16,29 @@ function Navigaion() {
             header: ({ scene }) => {
               return <Header title={'Trang chủ'} />;
             },
+
           }} />
-        <Stack.Screen name='ManageOrder' component={ManageOrder}
+        <Stack.Screen name='ManageOrder' title={'Thêm order'} component={ManageOrder}
           options={{
-            header: ({ scene }) => {
-              return <Header title={'Thêm order'} />;
-            },
+            // header: ({ scene }) => {
+            //   return <Header title={'Thêm order'} />;
+            // },
+            headerTitle:'Order'
           }}
         />
         <Stack.Screen name='Login' component={LoginScreen}
           options={{
-            header: ({ scene }) => {
-              return <Header title={'Đăng nhập'} />;
-            },
+            // header: ({ scene }) => {
+            //   return <Header title={'Đăng nhập'} />;
+            // },
+            headerTitle:'Đăng nhập'
           }} />
         <Stack.Screen name='OrderDetail' component={OrderDetail}
           options={{
-            header: ({ scene }) => {
-              return <Header title={'Tính tiền'} />;
-            },
+            // header: ({ scene }) => {
+            //   return <Header title={'Tính tiền'} />;
+            // },
+            headerTitle:'Tính tiền'
           }} />
       </Stack.Navigator>
     </NavigationContainer>

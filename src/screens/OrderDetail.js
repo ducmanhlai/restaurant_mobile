@@ -19,7 +19,7 @@ function OrderDetail(props) {
     const listFood = props.listFood;
     const [modalVisible, setModalVisible] = useState(false);
     const [order, setOrder] = useState(props.route.params.order)
-   
+
     const socket = io(baseURL)
     const sts = 1;
     const dispatch = useDispatch();
@@ -45,7 +45,7 @@ function OrderDetail(props) {
         }
     }, [sts])
     return (
-        <View style={{ height: '100%', width: '100%', backgroundColor: '#f7f7f773' }}>
+        <View style={{ height: '100%', width: '100%', }}>
             <Modal animationType="slide" visible={modalVisible}></Modal>
             <View style={{ backgroundColor: 'white', zIndex: 1, minHeight: '10%', justifyContent: 'space-evenly' }}>
                 <Text style={{ color: 'black' }}>Bàn số: {order.table}</Text>
@@ -61,16 +61,21 @@ function OrderDetail(props) {
                     flexGrow: 1,
                 }}
             />
-            <View style={{ minHeight: '20%', width: '100%', alignItems: 'center', flexDirection: 'row', marginHorizontal: 10, position: 'relative', zIndex: 2 }}>
+            <View style={{ backgroundColor: 'white', minHeight: '15%', width: '100%', alignItems: 'center', flexDirection: 'row', marginHorizontal: 10, position: 'relative', zIndex: 2 }}>
                 <TouchableOpacity style={{ height: '30%', backgroundColor: '#ed2222', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}><Text style={{ fontSize: 18, color: 'white', fontWeight: '700' }}>Quay lại</Text></TouchableOpacity>
-                <TouchableOpacity style={{ height: '30%', backgroundColor: '#00ecff99', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}><Text style={{ fontSize: 18, color: 'white', fontWeight: '700' }}>Xác nhận</Text></TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        socket.emit()
+                    }}
+                    style={{ height: '30%', backgroundColor: '#00ecff99', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}>
+                    <Text style={{ fontSize: 18, color: 'white', fontWeight: '700' }}>Xác nhận</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
-    
+
     function itemFood({ index, item }) {
         let food = getDetailFood(item.id_food)
-        console.log(food)
         return (
             <View style={{ height: 100, width: '100%', backgroundColor: '#bbffec57', margin: 10, borderRadius: 20, alignItems: 'center', flexDirection: 'row' }}>
                 <Image source={{
@@ -86,7 +91,7 @@ function OrderDetail(props) {
                         <Text style={{ marginLeft: 3, paddingTop: 1, }}>{item.quantity}</Text>
                     </View>
                 </View>
-                <TouchableOpacity style={{ height: '50%', backgroundColor: '#ed2222', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}><Text style={{ fontSize: 18, color: 'white' }}>Hủy</Text></TouchableOpacity>
+                {/* <TouchableOpacity style={{ height: '50%', backgroundColor: '#ed2222', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}><Text style={{ fontSize: 18, color: 'white' }}>Hủy</Text></TouchableOpacity> */}
             </View>
         )
     }
