@@ -87,7 +87,7 @@ function HomeScreen(props) {
         renderItem={({ index, item }) => {
           let total = 0;
           for (let i of item.detail) {
-            total += i.price * i.quantity
+            total += i.status!=3 ? i.price * i.quantity :0;
           }
           
           return (

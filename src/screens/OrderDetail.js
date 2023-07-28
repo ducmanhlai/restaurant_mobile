@@ -19,7 +19,9 @@ function OrderDetail(props) {
     const listFood = props.listFood;
     const [modalVisible, setModalVisible] = useState(false);
     const [order, setOrder] = useState(props.route.params.order)
-
+    const orderDetail = order.detail.filter(item=>{
+        return item.status!=3
+    })
     const socket = io(baseURL)
     const sts = 1;
     const dispatch = useDispatch();
@@ -54,7 +56,7 @@ function OrderDetail(props) {
             </View>
             <FlatList
                 style={{ maxHeight: '80%', backgroundColor: 'white', paddingRight: 10, position: 'relative', zIndex: 1 }}
-                data={order.detail}
+                data={orderDetail}
                 renderItem={itemFood}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{

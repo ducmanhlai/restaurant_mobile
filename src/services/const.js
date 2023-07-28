@@ -1,2 +1,2 @@
-const baseURL ='http://192.168.1.4:8080'
+const baseURL ='https://49ab-118-68-53-218.ngrok-free.app'
 export default baseURL
