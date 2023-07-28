@@ -67,7 +67,7 @@ function OrderDetail(props) {
                 <TouchableOpacity style={{ height: '30%', backgroundColor: '#ed2222', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}><Text style={{ fontSize: 18, color: 'white', fontWeight: '700' }}>Quay lại</Text></TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => {
-                        socket.emit()
+                        socket.emit('payOrder',order)
                     }}
                     style={{ height: '30%', backgroundColor: '#00ecff99', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10 }}>
                     <Text style={{ fontSize: 18, color: 'white', fontWeight: '700' }}>Xác nhận</Text>

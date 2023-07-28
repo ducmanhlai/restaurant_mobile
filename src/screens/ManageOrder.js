@@ -22,7 +22,6 @@ import baseURL from "../services/const";
 import ItemOrder from "./custom/ItemOrder";
 function ManageOrder(props) {
     const navigation = props.navigation;
-    const listOrder = props.listOrder;
     const order = props.route.params?.order || null;
     const [listTable, setListTable] = useState([])
     const [listTypeFood, setListTypeFood] = useState([])
@@ -170,53 +169,12 @@ function ManageOrder(props) {
             </View>
         )
     }
-    // function itemOrder({ index, item }) {
-    //     const [isCancel,setIsCancel] = useState(item.status==1)
-    //     let food = getDetailFood(item.id_food)
-    //     return (
-    //         <View style={{ height: 100, width: '100%', backgroundColor: '#bbffec57', margin: 10, borderRadius: 20, alignItems: 'center', flexDirection: 'row' }}>
-    //             <Image source={{
-    //                 uri: food?.avatar,
-    //             }}
-    //                 style={{ height: 80, flex: 2, margin: 10, borderRadius: 20 }}
-    //             ></Image>
-    //             <View style={{ flex: 3 }}>
-    //                 <Text>{food.name}</Text>
-    //                 <Text>{VietNamDong.format(item.price)}</Text>
-    //                 <View style={{ flexDirection: 'row' }}>
-    //                     <Text style={{ paddingTop: 1, }}>Số lượng: </Text>
-    //                     <Text style={{ marginLeft: 3, paddingTop: 1, }}>{item.quantity}</Text>
-    //                 </View>
-    //             </View>
-    //             <TouchableOpacity
-    //                 disabled={isCancel}
-    //                 onPress={() => {
-    //                     socket.emit('updateStatusDetail', {
-    //                         "id": item.id,
-    //                         "status": 3
-    //                     })
-    //                     Alert.alert('Thông báo', 'Đã hủy')
-    //                     setIsCancel(false)
-    //                 }}
-    //                 style={{ height: '50%', backgroundColor: '#ed2222', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10, opacity: isCancel ? 1 : 0.5 }}>
-    //                 <Text style={{ fontSize: 18, color: 'white' }}>Hủy</Text>
-    //             </TouchableOpacity>
-    //         </View>
-    //     )
-    // }
-    function getDetailFood(id) {
-        for (let i of listFood) {
-            if (i.id == id) {
-                return i
-            }
-        }
-    }
     function navigationView() {
         return (
             <View >
                 <FlatList
                     data={listDetail}
-                    renderItem={(item)=> {return<ItemOrder item={item} />}}
+                    renderItem={({item})=> {return<ItemOrder item={item} />}}
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={{
                     }}

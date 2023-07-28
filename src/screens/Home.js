@@ -1,20 +1,21 @@
 import * as React from 'react';
 import { View, Text, ToastAndroid, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { connect } from 'react-redux';
 import io from 'socket.io-client';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import moment from 'moment';
 import baseURL from '../services/const';
 import axios from '../services/axios';
+import { compareByStatus, compareByTime } from '../common';
 function HomeScreen(props) {
   const navigation = props.navigation
   const accesstoken = props.accesstoken;
   const user = props.user;
   // const role = user.role;
   const [enable, setEnable] = useState(true)
-  const [listStatus,setListStatus]= useState(['Đã nhận','Đã hoàn thành', 'Đã hủy'])
+  const [listStatus, setListStatus] = useState(['Đã nhận', 'Đang làm', 'Đã hủy', 'Đã hoàn thành'])
   const role = 3
   const listOrder = props.listOrder;
   const sts = 1;
@@ -83,32 +84,33 @@ function HomeScreen(props) {
     return (
       <FlatList
         style={{ height: '100%' }}
-        data={listOrder}
+        data={listOrder.sort(compareByStatus).sort(compareByTime)}
         renderItem={({ index, item }) => {
           let total = 0;
           for (let i of item.detail) {
-            total += i.status!=3 ? i.price * i.quantity :0;
+            total += i.status != 3 ? i.price * i.quantity : 0;
           }
-          
+
           return (
             <View style={styles.itemOrder}>
               <View style={{ flex: 8 }}>
                 <Text style={styles.textItem}>Bàn số: {item.table}</Text>
                 <Text style={styles.textItem}>Thời gian: {moment(item.time).format("HH:mm DD/MM/YYYY")}</Text>
-                <Text style={styles.textItem}>Trạng thái: {listStatus[item.status-1]}</Text>
+                <Text style={styles.textItem}>Trạng thái: {listStatus[item.status - 1]}</Text>
                 <Text style={styles.textItem}>Thành tiền: {total.toLocaleString('vi-VN', {
                   style: 'currency',
                   currency: 'VND',
                 })}</Text>
               </View>
               <View>
-                <TouchableOpacity style={styles.btnItem}
+                <TouchableOpacity style={[styles.btnItem, { opacity: item.status < 3 ? 1 : 0.5 }]}
+                 disabled={ !(item.status < 3)}
                   onPress={() => { navigation.navigate('OrderDetail', { order: item }) }}
                 >
                   <Text>Tính tiền</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={item.status==1 ? styles.btnItem : [styles.btnItem,{backgroundColor:'black'}]}
-                  onPress={item.status==1 ? () => { navigation.navigate('ManageOrder', { order: item }) }: null}
+                <TouchableOpacity style={styles.btnItem}
+                  onPress={() => { navigation.navigate('ManageOrder', { order: item }) }}
                 >
                   <Text>Sửa</Text>
                 </TouchableOpacity>
@@ -147,10 +149,10 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: 'center'
   },
-  textItem:{
-    color:'black',
-    fontSize:18,
-    marginBottom:5
+  textItem: {
+    color: 'black',
+    fontSize: 18,
+    marginBottom: 5
   },
   btnItem: { flex: 2, backgroundColor: '#00ecff99', width: 80, height: 40, marginBottom: 10, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }
 })
