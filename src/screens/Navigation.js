@@ -4,15 +4,42 @@ import { NavigationContainer } from '@react-navigation/native';
 import LoginScreen from './Login';
 import HomeScreen from './Home';
 import ManageOrder from './ManageOrder';
+import OrderDetail from './OrderDetail';
+import Header from './custom/Header';
 const Stack = createNativeStackNavigator();
-
 function Navigaion() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name='ManageOrder' component={ManageOrder}/>
-        <Stack.Screen name='Login' component={LoginScreen}/>
+        <Stack.Screen name="Home" component={HomeScreen}
+          options={{
+            header: ({ scene }) => {
+              return <Header title={'Trang chủ'} />;
+            },
+
+          }} />
+        <Stack.Screen name='ManageOrder' title={'Thêm order'} component={ManageOrder}
+          options={{
+            // header: ({ scene }) => {
+            //   return <Header title={'Thêm order'} />;
+            // },
+            headerTitle:'Order'
+          }}
+        />
+        <Stack.Screen name='Login' component={LoginScreen}
+          options={{
+            // header: ({ scene }) => {
+            //   return <Header title={'Đăng nhập'} />;
+            // },
+            headerTitle:'Đăng nhập'
+          }} />
+        <Stack.Screen name='OrderDetail' component={OrderDetail}
+          options={{
+            // header: ({ scene }) => {
+            //   return <Header title={'Tính tiền'} />;
+            // },
+            headerTitle:'Tính tiền'
+          }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
