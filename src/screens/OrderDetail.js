@@ -77,7 +77,7 @@ function OrderDetail(props) {
     );
 
     function itemFood({ index, item }) {
-        let food = getDetailFood(item.id_food)
+        let food = getDetailFood(item.id_dish)
         return (
             <View style={{ height: 100, width: '100%', backgroundColor: '#bbffec57', margin: 10, borderRadius: 20, alignItems: 'center', flexDirection: 'row' }}>
                 <Image source={{

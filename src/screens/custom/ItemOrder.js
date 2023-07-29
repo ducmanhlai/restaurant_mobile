@@ -14,7 +14,7 @@ function ItemOrder(props) {
     const listFood = props.listFood
     const socket = io(baseURL)
     const item = props.item
-    const food= getDetailFood(item.id_food)
+    const food= getDetailFood(item.id_dish)
     const [isCancel, setIsCancel] = useState(item.status==1)
     return (   
         <View style={{ height: 100, width: '100%', backgroundColor: '#bbffec57', margin: 10, borderRadius: 20, alignItems: 'center', flexDirection: 'row' }}>

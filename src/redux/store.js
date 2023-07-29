@@ -42,7 +42,7 @@ const listOrder = (state = [], action) => {
       return [...action.data]
     case "ADD_ORDER":
       return [...state.filter(item=>{
-        return item.id.localeCompare(action.data.id) !=0 
+        return item.id != action.data.id
       }),action.data];
     case 'REMOVE_ORDER':
       return []

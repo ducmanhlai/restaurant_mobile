@@ -3,6 +3,8 @@ import { View, Text, ToastAndroid, StyleSheet, FlatList, TouchableOpacity } from
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { connect } from 'react-redux';
+import 'react-native-get-random-values'
+import { v4 as uuidv4 } from 'uuid';
 import io from 'socket.io-client';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import moment from 'moment';
@@ -90,11 +92,10 @@ function HomeScreen(props) {
           for (let i of item.detail) {
             total += i.status != 3 ? i.price * i.quantity : 0;
           }
-
           return (
             <View style={styles.itemOrder}>
               <View style={{ flex: 8 }}>
-                <Text style={styles.textItem}>Bàn số: {item.table}</Text>
+                <Text style={styles.textItem}>Bàn số: {item?.table}</Text>
                 <Text style={styles.textItem}>Thời gian: {moment(item.time).format("HH:mm DD/MM/YYYY")}</Text>
                 <Text style={styles.textItem}>Trạng thái: {listStatus[item.status - 1]}</Text>
                 <Text style={styles.textItem}>Thành tiền: {total.toLocaleString('vi-VN', {
@@ -104,12 +105,13 @@ function HomeScreen(props) {
               </View>
               <View>
                 <TouchableOpacity style={[styles.btnItem, { opacity: item.status < 3 ? 1 : 0.5 }]}
-                 disabled={ !(item.status < 3)}
+                  disabled={!(item.status < 3)}
                   onPress={() => { navigation.navigate('OrderDetail', { order: item }) }}
                 >
                   <Text>Tính tiền</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.btnItem}
+                <TouchableOpacity style={[styles.btnItem, { opacity: item.status == 4 ? 0.5 : 1 }]}
+                  disabled={item.status == 4}
                   onPress={() => { navigation.navigate('ManageOrder', { order: item }) }}
                 >
                   <Text>Sửa</Text>
@@ -119,7 +121,7 @@ function HomeScreen(props) {
           )
         }
         }
-        keyExtractor={(item) => item.id}
+        keyExtractor={({item,index}) => uuidv4()}
       />
     )
   }
