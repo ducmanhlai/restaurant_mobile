@@ -11,6 +11,7 @@ import moment from 'moment';
 import baseURL from '../services/const';
 import axios from '../services/axios';
 import { compareByStatus, compareByTime } from '../common';
+import ItemHome from './custom/ItemHome';
 function HomeScreen(props) {
   const navigation = props.navigation
   const accesstoken = props.accesstoken;
@@ -87,39 +88,7 @@ function HomeScreen(props) {
       <FlatList
         style={{ height: '100%' }}
         data={listOrder.sort(compareByStatus).sort(compareByTime)}
-        renderItem={({ index, item }) => {
-          let total = 0;
-          for (let i of item.detail) {
-            total += i.status != 3 ? i.price * i.quantity : 0;
-          }
-          return (
-            <View style={styles.itemOrder}>
-              <View style={{ flex: 8 }}>
-                <Text style={styles.textItem}>Bàn số: {item?.table}</Text>
-                <Text style={styles.textItem}>Thời gian: {moment(item.time).format("HH:mm DD/MM/YYYY")}</Text>
-                <Text style={styles.textItem}>Trạng thái: {listStatus[item.status - 1]}</Text>
-                <Text style={styles.textItem}>Thành tiền: {total.toLocaleString('vi-VN', {
-                  style: 'currency',
-                  currency: 'VND',
-                })}</Text>
-              </View>
-              <View>
-                <TouchableOpacity style={[styles.btnItem, { opacity: item.status < 3 ? 1 : 0.5 }]}
-                  disabled={!(item.status < 3)}
-                  onPress={() => { navigation.navigate('OrderDetail', { order: item }) }}
-                >
-                  <Text>Tính tiền</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.btnItem, { opacity: item.status == 4 ? 0.5 : 1 }]}
-                  disabled={item.status == 4}
-                  onPress={() => { navigation.navigate('ManageOrder', { order: item }) }}
-                >
-                  <Text>Sửa</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )
-        }
+        renderItem={({ index, item }) => <ItemHome item={item} navigation= {navigation}/>
         }
         keyExtractor={({item,index}) => uuidv4()}
       />

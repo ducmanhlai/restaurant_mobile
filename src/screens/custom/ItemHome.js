@@ -1,28 +1,30 @@
 import React, { useState, } from "react";
 import {
-    Image,
     Text,
     TouchableOpacity,
     View,
-    Alert,
+    StyleSheet
 } from "react-native";
 import { connect } from "react-redux";
+import moment from "moment";
 import { formatCurrency } from "../../common";
 function ItemHome(props) {
     const item = props.item;
-    navigation = props.navigation
-    const food = getDetailFood(item.id_dish)
+    navigation = props.navigation;
+    const listOrder = props.listOrder;
     let total = 0;
     for (let i of item.detail) {
       total += i.status != 3 ? i.price * i.quantity : 0;
     }
-    const [isCancel, setIsCancel] = useState(item.status == 1)
+    const listStatus= ['Đã nhận', 'Đang làm', 'Đã hủy', 'Đã hoàn thành']
+    let status = item.status-1
+    console.log(status)
     return (
         <View style={styles.itemOrder}>
           <View style={{ flex: 8 }}>
             <Text style={styles.textItem}>Bàn số: {item?.table}</Text>
             <Text style={styles.textItem}>Thời gian: {moment(item.time).format("HH:mm DD/MM/YYYY")}</Text>
-            <Text style={styles.textItem}>Trạng thái: {listStatus[item.status - 1]}</Text>
+            <Text style={styles.textItem}>Trạng thái: {listStatus[status]}</Text>
             <Text style={styles.textItem}>Thành tiền: {formatCurrency(total)}</Text>
           </View>
           <View>
@@ -42,6 +44,38 @@ function ItemHome(props) {
         </View>
       )
 }
+const styles = StyleSheet.create({
+  itemOrder: {
+    flexDirection: 'row',
+    width: '100%',
+    height: 150,
+    backgroundColor: 'white',
+    padding: 15,
+    marginBottom: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    // Đảm bảo sử dụng elevation trên Android để có hiệu ứng đổ bóng tương tự.
+    elevation: 4,
+  },
+  btnAdd: {
+    flexDirection: 'row',
+    backgroundColor: '#0080ff',
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    borderRadius: 30,
+    justifyContent: 'center'
+  },
+  textItem: {
+    color: 'black',
+    fontSize: 18,
+    marginBottom: 5
+  },
+  btnItem: { flex: 2, backgroundColor: '#00ecff99', width: 80, height: 40, marginBottom: 10, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }
+})
 export default connect(state => {
     return state
 })(ItemHome);
