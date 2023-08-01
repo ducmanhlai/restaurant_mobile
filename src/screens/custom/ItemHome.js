@@ -18,7 +18,6 @@ function ItemHome(props) {
     }
     const listStatus= ['Đã nhận', 'Đang làm', 'Đã hủy', 'Đã hoàn thành']
     let status = item.status-1
-    console.log(status)
     return (
         <View style={styles.itemOrder}>
           <View style={{ flex: 8 }}>
