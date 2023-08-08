@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, ToastAndroid, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ToastAndroid, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { connect } from 'react-redux';
@@ -7,22 +7,18 @@ import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid';
 import io from 'socket.io-client';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
-import AnimatedLoader from 'react-native-animated-loader';
 import baseURL from '../services/const';
 import axios from '../services/axios';
-
-import { compareByStatus} from '../common';
+import { compareByStatus, compareByTime } from '../common';
 import ItemHome from './custom/ItemHome';
-function HomeScreen(props) {
+function NewHomeScreen(props) {
   const navigation = props.navigation
   const accesstoken = props.accesstoken;
   const user = props.user;
-  // const role = user.role;
-  const [enable, setEnable] = useState(true)
-  const [listStatus, setListStatus] = useState(['Đã nhận', 'Đang làm', 'Đã hủy', 'Đã hoàn thành']);
-  const [loading, setLoading] = useState(true)
   const role = 3
   const listOrder = props.listOrder;
+  const listTable = [];
+  
   const sts = 1;
   const dispatch = useDispatch();
   useEffect(() => {
@@ -31,10 +27,7 @@ function HomeScreen(props) {
       const data = (await axios.get('/api/v1/food/get')).data.data
       dispatch({ type: 'INIT_LIST_FOOD', data: data })
     })().catch(err => {
-      Alert.alert('Thông báo', 'Có lỗi xảy ra')
       console.log(err)
-    }).finally(() => {
-      setLoading(true)
     })
     const socket = io(baseURL)
     socket.on('connect', function () {
@@ -60,13 +53,6 @@ function HomeScreen(props) {
   return (
     (role == 3 ?
       <View style={{ padding: 10 }}>
-        <AnimatedLoader
-          visible={loading}
-          overlayColor="rgba(255,255,255,0.75)"
-          animationStyle={styles.lottie}
-          speed={1}>
-          <Text>Doing something...</Text>
-        </AnimatedLoader>
         {
           listOrder.length > 0 ? flatListOrder() : <View><Text>Rỗng</Text></View>
         }
@@ -98,12 +84,12 @@ function HomeScreen(props) {
     return (
       <FlatList
         style={{ height: '100%' }}
-        data={listOrder.filter(item => {
-          return item.status != 4
-        }).sort(compareByStatus)}
-        renderItem={({ index, item }) => <ItemHome item={item} navigation={navigation} />
+        data={listOrder.filter(item=>{
+          return item.status!=4
+        }).sort(compareByStatus).sort(compareByTime)}
+        renderItem={({ index, item }) => <ItemHome item={item} navigation= {navigation}/>
         }
-        keyExtractor={({ item, index }) => uuidv4()}
+        keyExtractor={({item,index}) => uuidv4()}
       />
     )
   }
@@ -124,10 +110,6 @@ const styles = StyleSheet.create({
     // Đảm bảo sử dụng elevation trên Android để có hiệu ứng đổ bóng tương tự.
     elevation: 4,
   },
-  lottie: {
-    width: 100,
-    height: 100,
-  },
   btnAdd: {
     flexDirection: 'row',
     backgroundColor: '#0080ff',
@@ -146,4 +128,4 @@ const styles = StyleSheet.create({
 })
 export default connect(state => {
   return state
-})(HomeScreen);
+})(NewHomeScreen);
