@@ -10,8 +10,7 @@ import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import AnimatedLoader from 'react-native-animated-loader';
 import baseURL from '../services/const';
 import axios from '../services/axios';
-
-import { compareByStatus} from '../common';
+import { compareByStatus } from '../common';
 import ItemHome from './custom/ItemHome';
 function HomeScreen(props) {
   const navigation = props.navigation
@@ -25,6 +24,7 @@ function HomeScreen(props) {
   const listOrder = props.listOrder;
   const sts = 1;
   const dispatch = useDispatch();
+ 
   useEffect(() => {
     // getUser()
     (async () => {
@@ -33,8 +33,10 @@ function HomeScreen(props) {
     })().catch(err => {
       Alert.alert('Thông báo', 'Có lỗi xảy ra')
       console.log(err)
-    }).finally(() => {
-      setLoading(true)
+    }).finally(() => { 
+      setTimeout(() => {
+        setLoading(!loading);
+      }, 2000);
     })
     const socket = io(baseURL)
     socket.on('connect', function () {
@@ -61,11 +63,12 @@ function HomeScreen(props) {
     (role == 3 ?
       <View style={{ padding: 10 }}>
         <AnimatedLoader
+          source={require("../animation/animation_ll2in0tu.json")}
           visible={loading}
           overlayColor="rgba(255,255,255,0.75)"
           animationStyle={styles.lottie}
           speed={1}>
-          <Text>Doing something...</Text>
+          <Text>Đang tải...</Text>
         </AnimatedLoader>
         {
           listOrder.length > 0 ? flatListOrder() : <View><Text>Rỗng</Text></View>

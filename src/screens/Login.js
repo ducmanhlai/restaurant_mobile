@@ -15,8 +15,7 @@ export default function LoginScreen({ navigation }) {
     const [password, setPassword] = useState("");
     const dispatch = useDispatch();
     const [accesstoken,setAccessToken] = useState(useSelector((state) => state.accesstoken));
-    if(accesstoken.token.length>0 )navigation.navigate('Home')
-    
+    if(accesstoken.token.length>0 ) navigation.navigate('Home')
     return (
         <View style={styles.container}>
             <StatusBar style="auto" />

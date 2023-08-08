@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 import { connect } from "react-redux";
 import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import AnimatedLoader from 'react-native-animated-loader';
 import { formatCurrency } from "../common";
 import io from 'socket.io-client';
 import axios from '../services/axios';
@@ -33,6 +34,7 @@ function ManageOrder(props) {
     const [listDetail, setListDetail] = useState();
     const [openTable, setOpenTable] = useState(false);
     const [openTypeFood, setOpenTypeFood] = useState(false);
+    const [loading,setLoading] = useState(true)
     const drawer = useRef(null);
     const socket = io(baseURL)
     const sts = 1;
@@ -42,8 +44,9 @@ function ManageOrder(props) {
         currency: 'VND',
     });
     useEffect(() => {
-        getListFood();
+        
         (async () => {
+            getListFood();
             const data = (await axios.get('/api/v1/table/get')).data.data;
             let maxId = data[0].id;
             data.forEach(element => {
@@ -55,7 +58,9 @@ function ManageOrder(props) {
                 listTmp = [{ label: `Bàn số ${i}`, value: i }, ...listTmp]
             }
             setListTable([...listTmp])
-        })()
+        })().finally(()=>{
+            setLoading(!loading)
+        })
     }, [])
     useEffect(() => {
         // getUser()
@@ -79,6 +84,14 @@ function ManageOrder(props) {
             drawerPosition={'right'}
             renderNavigationView={navigationView}>
             <View style={{ backgroundColor: '#f7f7f773', flex: 1, }}>
+            <AnimatedLoader
+                    source={require("../animation/animation_ll2in0tu.json")}
+                    visible={loading}
+                    overlayColor="rgba(255,255,255,0.75)"
+                    animationStyle={styles.lottie}
+                    speed={1}>
+                    <Text>Đang tải...</Text>
+                </AnimatedLoader>
                 <View style={{ flexDirection: 'row', width: '100%', marginTop: 10 }}>
                     <DropDownPicker
                         placeholder={table == 0 ? 'Chọn bàn' : `Bàn số ${table}`}
@@ -174,7 +187,7 @@ function ManageOrder(props) {
             <View >
                 <FlatList
                     data={listDetail}
-                    renderItem={({item})=> {return<ItemOrder item={item} />}}
+                    renderItem={({ item }) => { return <ItemOrder item={item} /> }}
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={{
                     }}
@@ -237,6 +250,10 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 4,
     },
+    lottie: {
+        width: 100,
+        height: 100,
+      },
 });
 
 export default connect(state => {
