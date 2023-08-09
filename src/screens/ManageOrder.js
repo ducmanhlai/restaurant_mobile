@@ -22,6 +22,7 @@ import axios from '../services/axios';
 import baseURL from "../services/const";
 import ItemOrder from "./custom/ItemOrder";
 function ManageOrder(props) {
+    const user= props.user;
     const navigation = props.navigation;
     const order = props.route.params?.order || null;
     const [listTable, setListTable] = useState([])
@@ -209,6 +210,7 @@ function ManageOrder(props) {
         let data = {
             id: order != null ? order.id : null,
             table: table,
+            id_staff:user.id,
             detail: [...listFood.filter(item => {
                 return item.quantity > 0
             }).map(item => {

@@ -13,15 +13,20 @@ import { connect } from "react-redux";
 import io from 'socket.io-client';
 import baseURL from "../services/const";
 import moment from "moment/moment";
+import { formatCurrency } from "../common";
 function OrderDetail(props) {
     const navigation = props.navigation;
     const listOrder = props.listOrder;
     const listFood = props.listFood;
     const [modalVisible, setModalVisible] = useState(false);
-    const [order, setOrder] = useState(props.route.params.order)
+    const [order, setOrder] = useState(props.route.params.order);
+    let totalBill=0
     const orderDetail = order.detail.filter(item=>{
         return item.status!=3
     })
+    orderDetail.forEach(element => {
+        totalBill+= element.price*element.quantity
+    });
     const socket = io(baseURL)
     const sts = 1;
     const dispatch = useDispatch();
@@ -30,7 +35,7 @@ function OrderDetail(props) {
         currency: 'VND',
     });
     useEffect(() => {
-
+       
     }, [])
     useEffect(() => {
         socket.on('connect', function () {
@@ -52,7 +57,7 @@ function OrderDetail(props) {
             <View style={{ backgroundColor: 'white', zIndex: 1, minHeight: '10%', justifyContent: 'space-evenly' }}>
                 <Text style={{ color: 'black' }}>Bàn số: {order.table}</Text>
                 <Text style={{ color: 'black' }}>Giờ tạo: {moment(order.time).format("HH:mm DD/MM/YYYY")}</Text>
-                <Text style={{ color: 'black' }}>Tổng tiền: {50000}</Text>
+                <Text style={{ color: 'black' }}>Tổng tiền: {formatCurrency(totalBill)}</Text>
             </View>
             <FlatList
                 style={{ maxHeight: '80%', backgroundColor: 'white', paddingRight: 10, position: 'relative', zIndex: 1 }}

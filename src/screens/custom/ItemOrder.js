@@ -9,11 +9,13 @@ import {
 import { connect } from "react-redux";
 import { formatCurrency } from "../../common";
 import io from 'socket.io-client';
+import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import baseURL from "../../services/const";
 function ItemOrder(props) {
     const listFood = props.listFood
     const socket = io(baseURL)
-    const item = props.item
+    const item = props.item;
+    const user= props.user;
     const food= getDetailFood(item.id_dish)
     const [isCancel, setIsCancel] = useState(item.status==1)
     return (   
@@ -31,6 +33,19 @@ function ItemOrder(props) {
                     <Text style={{ marginLeft: 3, paddingTop: 1, }}>{item.quantity}</Text>
                 </View>
             </View>
+            {user.role==4 ?   <TouchableOpacity
+                disabled={!isCancel}
+                onPress={() => {
+                    socket.emit('updateStatusDetail', {
+                        "id": item.id,
+                        "status": 4
+                    })
+                    Alert.alert('Thông báo', 'Đã hoàn thành')
+                    setIsCancel(false)
+                }}
+                style={{ height: '50%', backgroundColor: '#0dcaf0', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 8,width:'auto', opacity: isCancel ? 1 : 0.5 }}>
+                <Icon name='check' size={18} color={'white'}></Icon>
+            </TouchableOpacity>:null}
             <TouchableOpacity
                 disabled={!isCancel}
                 onPress={() => {
@@ -42,7 +57,7 @@ function ItemOrder(props) {
                     setIsCancel(false)
                 }}
                 style={{ height: '50%', backgroundColor: '#ed2222', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10, opacity: isCancel ? 1 : 0.5 }}>
-                <Text style={{ fontSize: 18, color: 'white' }}>Hủy</Text>
+                <Icon name='remove' size={18} color={'white'}></Icon>
             </TouchableOpacity>
         </View>
     )

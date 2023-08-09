@@ -9,29 +9,21 @@ import io from 'socket.io-client';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import AnimatedLoader from 'react-native-animated-loader';
 import baseURL from '../services/const';
-import axios from '../services/axios';
+import ItemOrder from './custom/ItemOrder';
 import { compareByStatus } from '../common';
 import ItemHome from './custom/ItemHome';
-function HomeScreen(props) {
+function KitChenScreen(props) {
   const navigation = props.navigation
-  const accesstoken = props.accesstoken;
   const user = props.user;
   const role = user.role;
-  const [enable, setEnable] = useState(true)
   const [listStatus, setListStatus] = useState(['Đã nhận', 'Đang làm', 'Đã hủy', 'Đã hoàn thành']);
   const [loading, setLoading] = useState(false)
   const listOrder = props.listOrder;
+  const order = props.route.params.order
   const sts = 1;
   const dispatch = useDispatch();
- 
+
   useEffect(() => {
-    (async () => {
-      const data = (await axios.get('/api/v1/food/get')).data.data
-      dispatch({ type: 'INIT_LIST_FOOD', data: data })
-    })().catch(err => {
-      Alert.alert('Thông báo', 'Có lỗi xảy ra')
-      console.log(err)
-    })
     const socket = io(baseURL)
     socket.on('connect', function () {
       // socket.emit('authenticate', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcl9uYW1lIjoibmhhbnZpZW4xIiwicGFzc3dvcmQiOiIkMmIkMTAkWVFGRjRZcnpTc0tHMzVJNnpZb2tST1A3em50akZPUjZwc2Uya2J1T2g5a0luamZDd2FPZFciLCJyb2xlIjozLCJsb2NrIjowLCJpYXQiOjE2ODk4NDYxNzEsImV4cCI6MTY4OTg2NDE3MX0.U42IXmzEeaSarhLzhZU1i0z0sK3sVTVd32KcLKGDBz8' });
@@ -54,19 +46,27 @@ function HomeScreen(props) {
     }
   }, [sts])
   return (
-      <View style={{ padding: 10 }}>
-        {
-          listOrder.length > 0 ? flatListOrder() : <View><Text>Rỗng</Text></View>
-        }
-        <View style={{ position: 'absolute', right: 10, top: 700 }}>
-          <TouchableOpacity style={styles.btnAdd} onPress={() => navigation.navigate('ManageOrder')}>
-            <Icon name="plus" size={40} color="white" />
-          </TouchableOpacity>
-        </View>
-      </View>
-     
+
+    <View style={{ padding: 10 }}>
+      {/* <AnimatedLoader
+          source={require("../animation/animation_ll2in0tu.json")}
+          visible={loading}
+          overlayColor="rgba(255,255,255,0.75)"
+          animationStyle={styles.lottie}
+          speed={1}>
+          <Text>Đang tải...</Text>
+        </AnimatedLoader> */}
+        <FlatList
+          data={order.detail}
+          renderItem={({ item }) => { return <ItemOrder item={item} /> }}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{
+          }}
+       />
+    </View>
+
   );
- 
+
   function flatListOrder() {
     return (
       <FlatList
@@ -119,4 +119,4 @@ const styles = StyleSheet.create({
 })
 export default connect(state => {
   return state
-})(HomeScreen);
+})(KitChenScreen);
