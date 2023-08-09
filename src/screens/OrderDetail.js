@@ -55,7 +55,7 @@ function OrderDetail(props) {
         <View style={{ height: '100%', width: '100%', }}>
             <Modal animationType="slide" visible={modalVisible}></Modal>
             <View style={{ backgroundColor: 'white', zIndex: 1, minHeight: '10%', justifyContent: 'space-evenly' }}>
-                <Text style={{ color: 'black' }}>Bàn số: {order.table}</Text>
+                <Text style={{ color: 'black' }}>Bàn: {order.table}</Text>
                 <Text style={{ color: 'black' }}>Giờ tạo: {moment(order.time).format("HH:mm DD/MM/YYYY")}</Text>
                 <Text style={{ color: 'black' }}>Tổng tiền: {formatCurrency(totalBill)}</Text>
             </View>

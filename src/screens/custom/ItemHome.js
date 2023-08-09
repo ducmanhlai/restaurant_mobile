@@ -17,12 +17,12 @@ function ItemHome(props) {
   for (let i of item.detail) {
     total += i.status != 3 ? i.price * i.quantity : 0;
   }
-  const listStatus = ['Đã nhận', 'Đang làm', 'Đã hủy', 'Đã hoàn thành']
+  const listStatus = ['Đã nhận', 'Đã hoàn thành', 'Đã hủy', 'Đã than toán']
   let status = item.status - 1
   return (
     <View style={styles.itemOrder}>
       <View style={{ flex: 8 }}>
-        <Text style={styles.textItem}>Bàn số: {item?.table}</Text>
+        <Text style={styles.textItem}>Bàn: {item?.table}</Text>
         <Text style={styles.textItem}>Thời gian: {moment(item.time).format("HH:mm DD/MM/YYYY")}</Text>
         <Text style={styles.textItem}>Trạng thái: {listStatus[status]}</Text>
         <Text style={styles.textItem}>Thành tiền: {formatCurrency(total)}</Text>

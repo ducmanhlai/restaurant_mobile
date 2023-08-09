@@ -16,14 +16,9 @@ function HomeScreen(props) {
   const navigation = props.navigation
   const accesstoken = props.accesstoken;
   const user = props.user;
-  const role = user.role;
-  const [enable, setEnable] = useState(true)
-  const [listStatus, setListStatus] = useState(['Đã nhận', 'Đang làm', 'Đã hủy', 'Đã hoàn thành']);
-  const [loading, setLoading] = useState(false)
   const listOrder = props.listOrder;
   const sts = 1;
   const dispatch = useDispatch();
- 
   useEffect(() => {
     (async () => {
       const data = (await axios.get('/api/v1/food/get')).data.data

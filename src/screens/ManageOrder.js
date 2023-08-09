@@ -95,7 +95,7 @@ function ManageOrder(props) {
                 </AnimatedLoader>
                 <View style={{ flexDirection: 'row', width: '100%', marginTop: 10 }}>
                     <DropDownPicker
-                        placeholder={table == 0 ? 'Chọn bàn' : `Bàn số ${table}`}
+                        placeholder={table == 0 ? 'Chọn bàn' : `Bàn ${table}`}
                         setOpen={() => { setOpenTable(!openTable) }}
                         multiple={false}
                         items={listTable}

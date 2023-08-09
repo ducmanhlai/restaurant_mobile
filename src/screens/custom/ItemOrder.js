@@ -33,19 +33,6 @@ function ItemOrder(props) {
                     <Text style={{ marginLeft: 3, paddingTop: 1, }}>{item.quantity}</Text>
                 </View>
             </View>
-            {user.role==4 ?   <TouchableOpacity
-                disabled={!isCancel}
-                onPress={() => {
-                    socket.emit('updateStatusDetail', {
-                        "id": item.id,
-                        "status": 4
-                    })
-                    Alert.alert('Thông báo', 'Đã hoàn thành')
-                    setIsCancel(false)
-                }}
-                style={{ height: '50%', backgroundColor: '#0dcaf0', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 8,width:'auto', opacity: isCancel ? 1 : 0.5 }}>
-                <Icon name='check' size={18} color={'white'}></Icon>
-            </TouchableOpacity>:null}
             <TouchableOpacity
                 disabled={!isCancel}
                 onPress={() => {

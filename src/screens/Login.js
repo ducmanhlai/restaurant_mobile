@@ -1,4 +1,4 @@
-import React, { useState,useEffect,useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     StyleSheet,
     Text,
@@ -8,7 +8,6 @@ import {
     StatusBar,
     ToastAndroid,
     SafeAreaView,
-    
 } from "react-native";
 import AnimatedLoader from 'react-native-animated-loader';
 import LinearGradient from 'react-native-linear-gradient';
@@ -17,14 +16,11 @@ import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import axios from '../services/axios';
 import { useSelector, useDispatch } from 'react-redux'
 export default function LoginScreen({ navigation }) {
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false)
     const [accesstoken, setAccessToken] = useState(useSelector((state) => state.accesstoken));
-   
-  
     if (accesstoken.token.length > 0) navigation.navigate('Home')
     return (
         <SafeAreaView style={styles.container}>
@@ -39,17 +35,17 @@ export default function LoginScreen({ navigation }) {
             <Animatable.Image source={{
                 uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw_DHz4baaRqCuAK145KvHH_xfHXUfDwxzsA&usqp=CAU'
             }} animation={'slideInDown'}
-            duration={1700}
+                duration={1700}
                 style={[{ height: 200, width: 200, borderRadius: 80, marginBottom: 10, marginTop: -36 }]}
             ></Animatable.Image>
             <Animatable.Text style={{ fontSize: 32, marginBottom: 50, color: '#000', fontWeight: '600' }}
-             animation={'slideInDown'}
-             duration={1000}
+                animation={'slideInDown'}
+                duration={1000}
             >Đăng nhập</Animatable.Text>
             <StatusBar style="auto" />
             <Animatable.View style={styles.inputView}
-            animation={'slideInLeft'}
-            duration={1000}
+                animation={'slideInLeft'}
+                duration={1000}
             >
                 <Icon name='smile-o' size={24} style={{ marginLeft: 16 }} color='#0693e3'></Icon>
                 <TextInput
@@ -60,8 +56,8 @@ export default function LoginScreen({ navigation }) {
                 />
             </Animatable.View>
             <Animatable.View style={styles.inputView}
-               animation={'slideInLeft'}
-               duration={1000}
+                animation={'slideInLeft'}
+                duration={1000}
             >
                 <Icon name='lock' size={29} style={{ marginLeft: 16, marginRight: 4 }} color='#0693e3'></Icon>
                 <TextInput
@@ -81,8 +77,6 @@ export default function LoginScreen({ navigation }) {
                 </LinearGradient>
             </TouchableOpacity>
         </SafeAreaView>
-
-
     );
     async function getUser(token) {
         const data = (await axios.get('/api/v1/user/get', {
