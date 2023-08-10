@@ -42,7 +42,7 @@ export default function LoginScreen({ navigation }) {
                 animation={'slideInDown'}
                 duration={1000}
             >Đăng nhập</Animatable.Text>
-            <StatusBar style="auto" />
+            <StatusBar />
             <Animatable.View style={styles.inputView}
                 animation={'slideInLeft'}
                 duration={1000}

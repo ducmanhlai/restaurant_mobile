@@ -10,19 +10,23 @@ import {
     DrawerLayoutAndroid,
     ToastAndroid,
     Alert,
+    SafeAreaView,
 } from "react-native";
 import { useDispatch } from 'react-redux';
 import { connect } from "react-redux";
 import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import AnimatedLoader from 'react-native-animated-loader';
+import { BlurView } from '@react-native-community/blur';
+import LinearGradient from "react-native-linear-gradient";
+import * as Animatable from 'react-native-animatable';
 import { formatCurrency } from "../common";
 import io from 'socket.io-client';
 import axios from '../services/axios';
 import baseURL from "../services/const";
 import ItemOrder from "./custom/ItemOrder";
 function ManageOrder(props) {
-    const user= props.user;
+    const user = props.user;
     const navigation = props.navigation;
     const order = props.route.params?.order || null;
     const [listTable, setListTable] = useState([])
@@ -35,7 +39,8 @@ function ManageOrder(props) {
     const [listDetail, setListDetail] = useState();
     const [openTable, setOpenTable] = useState(false);
     const [openTypeFood, setOpenTypeFood] = useState(false);
-    const [loading,setLoading] = useState(true)
+    const [noteVisible, setNoteVisible] = useState(true);
+    const [loading, setLoading] = useState(true)
     const drawer = useRef(null);
     const socket = io(baseURL)
     const sts = 1;
@@ -45,7 +50,7 @@ function ManageOrder(props) {
         currency: 'VND',
     });
     useEffect(() => {
-        
+
         (async () => {
             getListFood();
             const data = (await axios.get('/api/v1/table/get')).data.data;
@@ -59,7 +64,7 @@ function ManageOrder(props) {
                 listTmp = [{ label: `Bàn số ${i}`, value: i }, ...listTmp]
             }
             setListTable([...listTmp])
-        })().finally(()=>{
+        })().finally(() => {
             setLoading(!loading)
         })
     }, [])
@@ -84,57 +89,90 @@ function ManageOrder(props) {
             drawerWidth={300}
             drawerPosition={'right'}
             renderNavigationView={navigationView}>
-            <View style={{ backgroundColor: '#f7f7f773', flex: 1, }}>
-            <AnimatedLoader
+            <SafeAreaView style={{ height: '100%' }}>
+                <LinearGradient colors={['#0693e3', '#fff']} style={styles.linearGradient}
+                    start={{ x: 0.0, y: 0 }} end={{ x: 1, y: 0.75 }}>
+                    {/* <AnimatedLoader
                     source={require("../animation/animation_ll2in0tu.json")}
                     visible={loading}
                     overlayColor="rgba(255,255,255,0.75)"
                     animationStyle={styles.lottie}
                     speed={1}>
                     <Text>Đang tải...</Text>
-                </AnimatedLoader>
-                <View style={{ flexDirection: 'row', width: '100%', marginTop: 10 }}>
-                    <DropDownPicker
-                        placeholder={table == 0 ? 'Chọn bàn' : `Bàn ${table}`}
-                        setOpen={() => { setOpenTable(!openTable) }}
-                        multiple={false}
-                        items={listTable}
-                        open={openTable}
-                        setValue={setTable}
-                        style={{ width: '40%', left: 10 }}
-                    />
-                    <DropDownPicker
-                        style={{ width: '40%', right: 200 }}
-                        placeholder={'Chọn loại'}
-                        setOpen={() => { setOpenTypeFood(!openTypeFood) }}
-                        multiple={false}
-                        items={listTypeFood}
-                        open={openTypeFood}
-                        setValue={setTypeFood}
-                    ></DropDownPicker>
-                </View>
-                <View>
-                    {listFood.length > 0 ? renderListFood() : <View><Text>Đang tải</Text></View>}
-                </View>
-                <View style={{ flexDirection: 'column', alignItems: 'center', flex: 1, }}
-                >
-                    <TextInput
-                        placeholder="Ghi chú..."
-                        value={note}
-                        onChangeText={(text) => setNote(text)}
-                        style={[{ height: 90, width: '90%', marginVertical: 10 }, styles.textInputNote]}
-                    ></TextInput>
-                    <TouchableOpacity
-                        onPress={() => {
-                            handleOrder();
-                        }}
-                        style={[styles.textInputNote, { backgroundColor: '#00ecff99' }]}
-                    >
-                        <Text>{order != null ? 'Chỉnh sửa' : 'Tạo order'}</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <TouchableOpacity style={{ position: 'absolute', right: 10, top: 25 }} onPress={() => drawer.current.openDrawer()}><Icon name="list-ul" size={20} color='black'></Icon></TouchableOpacity>
+                </AnimatedLoader> */}
+                    <View style={{
+                        flexDirection: 'row',
+                        borderBottomColor: '#ccc',
+                        borderBottomWidth: 0.5,
+                        marginBottom: 5,
+
+                    }}>
+                        <Animatable.Image source={{
+                            uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw_DHz4baaRqCuAK145KvHH_xfHXUfDwxzsA&usqp=CAU'
+                        }} animation={'slideInDown'}
+                            duration={500}
+                            style={[{ height: 30, width: 30, borderRadius: 80, marginBottom: 'auto', marginTop: 'auto', marginRight: 8 }]}
+                        ></Animatable.Image>
+                        <Animatable.Text
+                            animation={'fadeIn'}
+                            duration={2000}
+                            style={{
+                                fontSize: 22,
+                                color: '#fff',
+                                fontWeight: '500', textTransform: 'uppercase', textAlign: 'center', marginTop: 20,
+                                marginBottom: 16,
+                            }}
+                        >Tạo đơn</Animatable.Text>
+                        <TouchableOpacity style={{ marginLeft: 'auto', marginTop: 'auto', marginBottom: 'auto' }} onPress={() => drawer.current.openDrawer()}><Icon name="list-ul" size={20} color='black'></Icon></TouchableOpacity>
+                    </View>
+                    <View style={{ flexDirection: 'row', width: '30%', marginTop: 10, marginLeft: 'auto', marginRight: 'auto' }}>
+                        <DropDownPicker
+                            placeholder={table == 0 ? 'Chọn bàn' : `Bàn ${table}`}
+                            setOpen={() => { setOpenTable(!openTable) }}
+                            multiple={false}
+                            items={listTable}
+                            open={openTable}
+                            setValue={setTable}
+                            placeholderStyle={{
+                                color: "grey",
+                                textAlign: 'center',
+                                fontWeight: "bold"
+                            }}
+                            style={{ width: '100%' }}
+                        />
+                    </View>
+                    <View>
+                        {/* {noteVisible && (
+                            <BlurView
+                                style={{ flex: 1, position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+                                blurType="dark" // Loại hiệu ứng blur (light, dark, extra light)
+                            />
+                        )} */}
+                        {listFood.length > 0 ? renderListFood() : <View><Text>Đang tải</Text></View>}
+                    </View>
+                  
+                    <View style={{ flexDirection: 'column', alignItems: 'center', flex: 1, width: '100%' }}>
+                        <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
+                            <TextInput
+                                placeholder="Ghi chú..."
+                                value={note}
+                                onChangeText={(text) => setNote(text)}
+                                style={[{ height: 90, width: '90%', marginVertical: 10 }, styles.textInputNote]}
+                            />
+                        </View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                handleOrder();
+                            }}
+                            style={[styles.btnAdd, { backgroundColor: '#00ecff99' }]}
+                        >
+                            <Text style={{ fontWeight: '600', color: '#555' }}>
+                                {order != null ? 'Chỉnh sửa' : 'Tạo order'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </LinearGradient>
+            </SafeAreaView>
         </DrawerLayoutAndroid>
     );
     function getListFood() {
@@ -152,7 +190,10 @@ function ManageOrder(props) {
     function renderListFood() {
         return (
             <FlatList
-                style={{ height: '70%', backgroundColor: 'white', marginTop: 10 }}
+                style={{
+                    height: '60%', backgroundColor: 'transparent', marginTop: 10, borderBottomColor: '#ccc',
+                    borderBottomWidth: 1,
+                }}
                 data={listFood}
                 renderItem={itemFood}
                 keyExtractor={(item) => item.id}
@@ -161,24 +202,24 @@ function ManageOrder(props) {
     }
     function itemFood({ index, item }) {
         return (
-            <View style={{ height: 120, width: '100%', backgroundColor: '#bbffec57', margin: 10, borderRadius: 20, alignItems: 'center', flexDirection: 'row' }}>
+            <View style={{ height: 110, width: '95%', backgroundColor: '#bbffec57', marginLeft: 'auto', marginRight: 'auto', borderRadius: 10, alignItems: 'center', flexDirection: 'row', marginBottom: 8 }}>
                 <Image source={{
                     uri: item.avatar,
                 }}
-                    style={{ height: 100, width: 150, margin: 10, borderRadius: 20 }}
+                    style={{ height: '65%', width: '22%', margin: 10, borderRadius: 8 }}
                 ></Image>
-                <View>
-                    <Text>{item.name}</Text>
-                    <View style={{ flexDirection: 'row' }}>
-                        <TouchableOpacity onPress={() => handleMinus(item.id)}>
-                            <Icon name='minus-circle' size={30} style={{ marginLeft: 10 }} color={'#e91323c9'} />
-                        </TouchableOpacity>
-                        <Text style={{ marginLeft: 10, paddingTop: 1, fontSize: 20 }}>{item.quantity}</Text>
-                        <TouchableOpacity style={{ marginLeft: 10 }} onPress={() => handlePlus(item.id)}>
-                            <Icon name='plus-circle' size={30} color={'#1ee913c9'} />
-                        </TouchableOpacity>
-                    </View>
-                    <Text>{formatCurrency(item.price)}</Text>
+                <View style={{ marginLeft: 10 }}>
+                    <Text style={[styles.textItem, { fontSize: 20 }]} numberOfLines={2}>{item.name}</Text>
+                    <Text style={styles.textItem}>{formatCurrency(item.price)}</Text>
+                </View>
+                <View style={{ flexDirection: 'row', marginTop: 'auto', marginBottom: 15, maxWidth: '50%', marginRight: 20, marginLeft: 'auto' }}>
+                    <TouchableOpacity onPress={() => handleMinus(item.id)}>
+                        <Icon name='minus-circle' size={24} style={{ marginLeft: 10 }} color={'#e91323c9'} />
+                    </TouchableOpacity>
+                    <Text style={{ marginLeft: 10, paddingTop: 1, fontSize: 17 }}>{item.quantity}</Text>
+                    <TouchableOpacity style={{ marginLeft: 10 }} onPress={() => handlePlus(item.id)}>
+                        <Icon name='plus-circle' size={24} color={'#1ee913c9'} />
+                    </TouchableOpacity>
                 </View>
             </View>
         )
@@ -210,7 +251,7 @@ function ManageOrder(props) {
         let data = {
             id: order != null ? order.id : null,
             table: table,
-            id_staff:user.id,
+            id_staff: user.id,
             detail: [...listFood.filter(item => {
                 return item.quantity > 0
             }).map(item => {
@@ -237,11 +278,20 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "space-around"
     },
+    textItem: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 12
+    },
+    btnAdd: {
+        padding: 12,
+        borderRadius: 10
+    },
     textInputNote: {
         padding: 10,
-        borderWidth: 1,
+        borderWidth: 0.5,
         borderColor: '#ccc',
-        borderRadius: 20,
+        borderRadius: 10,
         backgroundColor: '#fff',
         shadowColor: '#000',
         shadowOffset: {
@@ -255,7 +305,14 @@ const styles = StyleSheet.create({
     lottie: {
         width: 100,
         height: 100,
-      },
+    },
+    linearGradient: {
+        paddingTop: 10,
+        paddingLeft: 15,
+        paddingRight: 15,
+        borderRadius: 6,
+        flex: 1
+    },
 });
 
 export default connect(state => {

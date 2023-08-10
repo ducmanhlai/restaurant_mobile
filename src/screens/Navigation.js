@@ -12,19 +12,21 @@ function Navigaion() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Home" component={HomeScreen}
-          options={{
-            header: ({ scene }) => {
-              return <Header title={'Trang chủ'} />;
-            },
-
-          }} />
+         options={{
+          headerShown:false,
+          // header: ({ scene }) => {
+          //   return <Header title={'Đăng nhập'} />;
+          // },
+          headerTitle:'Đăng nhập'
+        }} />
         <Stack.Screen name='ManageOrder' title={'Thêm order'} component={ManageOrder}
-          options={{
-            // header: ({ scene }) => {
-            //   return <Header title={'Thêm order'} />;
-            // },
-            headerTitle:'Order'
-          }}
+         options={{
+          headerShown:false,
+          // header: ({ scene }) => {
+          //   return <Header title={'Đăng nhập'} />;
+          // },
+          headerTitle:'Đăng nhập'
+        }} 
         />
         <Stack.Screen name='Login' component={LoginScreen}
           options={{

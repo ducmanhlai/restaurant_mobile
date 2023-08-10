@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, ToastAndroid, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ToastAndroid, StyleSheet, FlatList, TouchableOpacity, Alert, StatusBar,Image } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { connect } from 'react-redux';
@@ -7,7 +7,8 @@ import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid';
 import io from 'socket.io-client';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
-import AnimatedLoader from 'react-native-animated-loader';
+import LinearGradient from 'react-native-linear-gradient';
+import * as Animatable from 'react-native-animatable';
 import baseURL from '../services/const';
 import axios from '../services/axios';
 import { compareByStatus } from '../common';
@@ -24,14 +25,14 @@ function HomeScreen(props) {
       const data = (await axios.get('/api/v1/food/get')).data.data
       dispatch({ type: 'INIT_LIST_FOOD', data: data })
     })().catch(err => {
-      Alert.alert('Thông báo', 'Có lỗi xảy ra')
+      ToastAndroid.show('Lỗi', 1000)
       console.log(err)
     })
     const socket = io(baseURL)
     socket.on('connect', function () {
       // socket.emit('authenticate', { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcl9uYW1lIjoibmhhbnZpZW4xIiwicGFzc3dvcmQiOiIkMmIkMTAkWVFGRjRZcnpTc0tHMzVJNnpZb2tST1A3em50akZPUjZwc2Uya2J1T2g5a0luamZDd2FPZFciLCJyb2xlIjozLCJsb2NrIjowLCJpYXQiOjE2ODk4NDYxNzEsImV4cCI6MTY4OTg2NDE3MX0.U42IXmzEeaSarhLzhZU1i0z0sK3sVTVd32KcLKGDBz8' });
       socket.on('err', (err) => {
-        ToastAndroid.show('Lỗi')
+        ToastAndroid.show('Lỗi', 1000)
       })
       socket.on('authenticate', data => {
         console.log(data)
@@ -49,29 +50,68 @@ function HomeScreen(props) {
     }
   }, [sts])
   return (
-      <View style={{ padding: 10 }}>
+    <LinearGradient colors={['#0693e3', '#fff']} style={styles.linearGradient}
+      start={{ x: 0.0, y: 0 }} end={{ x: 1, y: 0.75 }}
+    >
+      <View style={{
+        flexDirection: 'row',
+        borderBottomColor: '#ccc',
+        borderBottomWidth: 0.5,
+        marginBottom: 5,
+        
+      }}>
+        <Animatable.Image source={{
+                uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw_DHz4baaRqCuAK145KvHH_xfHXUfDwxzsA&usqp=CAU'
+            }} animation={'slideInDown'}
+                duration={500}
+                style={[{ height: 30, width: 30, borderRadius: 80, marginBottom: 'auto',marginTop:'auto',marginRight:8}]}
+            ></Animatable.Image>
+        <Animatable.Text
+          animation={'fadeIn'}
+          duration={2000}
+          style={{
+            fontSize: 22,
+            color: '#fff',
+            fontWeight: '500', textTransform: 'uppercase', textAlign: 'center', marginTop: 20,
+            marginBottom: 16,
+          }}
+        >Danh sách đơn</Animatable.Text>
         {
-          listOrder.length > 0 ? flatListOrder() : <View><Text>Rỗng</Text></View>
+          user.role!=4 ?  <TouchableOpacity style={styles.btnAdd} onPress={() => navigation.navigate('ManageOrder')}>
+          <Icon name="plus" style={{ fontWeight: '400', fontSize: 24 }} color="white" />
+        </TouchableOpacity>:null
         }
-        <View style={{ position: 'absolute', right: 10, top: 700 }}>
-          <TouchableOpacity style={styles.btnAdd} onPress={() => navigation.navigate('ManageOrder')}>
-            <Icon name="plus" size={40} color="white" />
-          </TouchableOpacity>
-        </View>
+       
       </View>
-     
+
+      {
+        listOrder.length > 0 ? flatListOrder() : <View style={{ height: '100%', alignItems: 'center', justifyContent: 'center' }}><Text>Chưa có gì</Text></View>
+      }
+      <StatusBar
+        animated={true}
+        backgroundColor="#0693e3"
+        barStyle={'default'}
+        hidden={false}
+      />
+
+
+    </LinearGradient>
   );
- 
   function flatListOrder() {
     return (
       <FlatList
-        style={{ height: '100%' }}
+        style={{
+          height: '100%',
+          borderBottomColor: '#ccc',
+          borderBottomWidth: 1,
+        }}
         data={listOrder.filter(item => {
           return item.status != 4
         }).sort(compareByStatus)}
         renderItem={({ index, item }) => <ItemHome item={item} navigation={navigation} />
         }
         keyExtractor={({ item, index }) => uuidv4()}
+
       />
     )
   }
@@ -97,13 +137,23 @@ const styles = StyleSheet.create({
     height: 100,
   },
   btnAdd: {
-    flexDirection: 'row',
     backgroundColor: '#0080ff',
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     alignItems: 'center',
-    borderRadius: 30,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    borderRadius: 60,
+    marginTop:10,
+    marginLeft: 'auto',
+    marginStart: 'auto',
+    
+  },
+  linearGradient: {
+    paddingTop: 10,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 6,
+    flex:1
   },
   textItem: {
     color: 'black',
