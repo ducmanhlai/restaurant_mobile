@@ -10,9 +10,9 @@ const compareByTime = (a, b) => {
     const timeB = moment(b.time);
     // So sánh thời gian của hai đối tượng
     if (timeA.isBefore(timeB)) {
-      return 1;
-    } else if (timeA.isAfter(timeB)) {
       return -1;
+    } else if (timeA.isAfter(timeB)) {
+      return 1;
     } else {
       return 0;
     }

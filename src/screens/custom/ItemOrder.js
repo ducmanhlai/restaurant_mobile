@@ -9,11 +9,13 @@ import {
 import { connect } from "react-redux";
 import { formatCurrency } from "../../common";
 import io from 'socket.io-client';
+import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import baseURL from "../../services/const";
 function ItemOrder(props) {
     const listFood = props.listFood
     const socket = io(baseURL)
-    const item = props.item
+    const item = props.item;
+    const user= props.user;
     const food= getDetailFood(item.id_dish)
     const [isCancel, setIsCancel] = useState(item.status==1)
     return (   
@@ -42,7 +44,7 @@ function ItemOrder(props) {
                     setIsCancel(false)
                 }}
                 style={{ height: '50%', backgroundColor: '#ed2222', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10, opacity: isCancel ? 1 : 0.5 }}>
-                <Text style={{ fontSize: 18, color: 'white' }}>Hủy</Text>
+                <Icon name='remove' size={18} color={'white'}></Icon>
             </TouchableOpacity>
         </View>
     )
