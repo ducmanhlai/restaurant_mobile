@@ -14,10 +14,11 @@ import baseURL from "../../services/const";
 function ItemTable(props) {
     const item = props.item;
     const navigation = props.navigation;
+    const user = props.user
     console.log(item)
     return (   
         <View style={{ height: 100, width: '40%', backgroundColor: item.isHollow ? '#bbffec57' :'white', margin: 10, borderRadius: 20, alignItems: 'center', flexDirection: 'row' }}>
-           <TouchableOpacity onPress={() => navigation.navigate('ManageOrder',{ order: item })} style={{height:'100%', width:'100%',justifyContent:'center',alignItems:'center'}}>
+           <TouchableOpacity onPress={() => { user.role != 4 ? navigation.navigate('ManageOrder', { order: item }) : navigation.navigate('Kitchen', { order: item }) }} style={{height:'100%', width:'100%',justifyContent:'center',alignItems:'center'}}>
             <Text>{item.name}</Text>
            </TouchableOpacity>
         </View>

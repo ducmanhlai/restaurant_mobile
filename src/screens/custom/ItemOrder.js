@@ -1,4 +1,4 @@
-import React, {  useState, } from "react";
+import React, { useState, } from "react";
 import {
     Image,
     Text,
@@ -15,10 +15,10 @@ function ItemOrder(props) {
     const listFood = props.listFood
     const socket = io(baseURL)
     const item = props.item;
-    const user= props.user;
-    const food= getDetailFood(item.id_dish)
-    const [isCancel, setIsCancel] = useState(item.status==1)
-    return (   
+    const user = props.user;
+    const food = getDetailFood(item.id_dish)
+    const [isCancel, setIsCancel] = useState(item.status == 1)
+    return (
         <View style={{ height: 100, width: '100%', backgroundColor: '#bbffec57', margin: 10, borderRadius: 20, alignItems: 'center', flexDirection: 'row' }}>
             <Image source={{
                 uri: food?.avatar,
@@ -33,6 +33,24 @@ function ItemOrder(props) {
                     <Text style={{ marginLeft: 3, paddingTop: 1, }}>{item.quantity}</Text>
                 </View>
             </View>
+            {
+                user.role == 4 ?
+                    <TouchableOpacity
+                        disabled={!isCancel}
+                        onPress={() => {
+                            socket.emit('updateStatusDetail', {
+                                "id": item.id,
+                                "status": 2
+                            })
+                            Alert.alert('Thông báo', 'Đã hoàn thành')
+                            setIsCancel(false)
+                        }}
+                        style={{ height: '50%', backgroundColor: '#0693e3', flex: 1, alignItems: 'center', justifyContent: "center", marginRight: 15, borderRadius: 10, opacity: isCancel ? 1 : 0.5 }}>
+                        <Icon name='check' size={18} color={'white'}></Icon>
+                    </TouchableOpacity>
+                    : null
+            }
+
             <TouchableOpacity
                 disabled={!isCancel}
                 onPress={() => {
@@ -58,4 +76,4 @@ function ItemOrder(props) {
 }
 export default connect(state => {
     return state
-  })(ItemOrder);
+})(ItemOrder);

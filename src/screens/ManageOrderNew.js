@@ -225,7 +225,7 @@ function ManageOrder(props) {
     }
     function handleOrder() {
         let data = {
-            id: order != null ? order.idOrder : null,
+            id: order.idOrder!=0 ? order.idOrder : null,
             table: table,
             id_staff: user.id,
             note: note,
@@ -238,7 +238,7 @@ function ManageOrder(props) {
                 }
             })]
         }
-        if (order != null) {
+        if (order.idOrder!=0) {
             socket.emit('updateOrderDetail', data)
             navigation.navigate('Home')
         }
