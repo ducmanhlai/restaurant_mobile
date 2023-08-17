@@ -22,7 +22,7 @@ function KitChenScreen(props) {
   const order = props.route.params.order
   const sts = 1;
   const dispatch = useDispatch();
-
+  console.log(order)
   useEffect(() => {
     const socket = io(baseURL)
     socket.on('connect', function () {
@@ -56,6 +56,7 @@ function KitChenScreen(props) {
           speed={1}>
           <Text>Đang tải...</Text>
         </AnimatedLoader> */}
+        <Text>Ghi chú: {order.note}</Text>
         <FlatList
           data={order.detail}
           renderItem={({ item }) => { return <ItemOrder item={item} /> }}

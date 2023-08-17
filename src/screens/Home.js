@@ -58,7 +58,6 @@ function HomeScreen(props) {
         borderBottomColor: '#ccc',
         borderBottomWidth: 0.5,
         marginBottom: 5,
-        
       }}>
         <Animatable.Image source={{
                 uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw_DHz4baaRqCuAK145KvHH_xfHXUfDwxzsA&usqp=CAU'
@@ -81,9 +80,7 @@ function HomeScreen(props) {
           <Icon name="plus" style={{ fontWeight: '400', fontSize: 24 }} color="white" />
         </TouchableOpacity>:null
         }
-       
       </View>
-
       {
         listOrder.length > 0 ? flatListOrder() : <View style={{ height: '100%', alignItems: 'center', justifyContent: 'center' }}><Text>Chưa có gì</Text></View>
       }

@@ -92,14 +92,14 @@ function ManageOrder(props) {
             <SafeAreaView style={{ height: '100%' }}>
                 <LinearGradient colors={['#0693e3', '#fff']} style={styles.linearGradient}
                     start={{ x: 0.0, y: 0 }} end={{ x: 1, y: 0.75 }}>
-                    {/* <AnimatedLoader
+                    <AnimatedLoader
                     source={require("../animation/animation_ll2in0tu.json")}
                     visible={loading}
                     overlayColor="rgba(255,255,255,0.75)"
                     animationStyle={styles.lottie}
                     speed={1}>
                     <Text>Đang tải...</Text>
-                </AnimatedLoader> */}
+                </AnimatedLoader>
                     <View style={{
                         flexDirection: 'row',
                         borderBottomColor: '#ccc',
@@ -252,6 +252,7 @@ function ManageOrder(props) {
             id: order != null ? order.id : null,
             table: table,
             id_staff: user.id,
+            note: note,
             detail: [...listFood.filter(item => {
                 return item.quantity > 0
             }).map(item => {

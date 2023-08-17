@@ -1,4 +1,8 @@
 {
   "name": "restaurant_mobile",
-  "displayName": "restaurant_mobile"
+  "displayName": "restaurant_mobile",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-2145075894839443~6107133068",
+    "ios_app_id": "ca-app-pub-2145075894839443~6107133068"
+  }
 }
