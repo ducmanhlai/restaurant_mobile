@@ -5,13 +5,15 @@ import HomeScreen from './Home';
 import ManageOrder from './ManageOrder';
 import OrderDetail from './OrderDetail';
 import KitchenScreen from './Kitchen';
+import NewHome from './NewHome';
 import Header from './custom/Header';
+import ManageOrderNew from './ManageOrderNew';
 const Stack = createNativeStackNavigator();
 function Navigaion() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Home" component={HomeScreen}
+      <Stack.Navigator initialRouteName="NewHome">
+        <Stack.Screen name="Home" component={NewHome}
          options={{
           headerShown:false,
           // header: ({ scene }) => {
@@ -19,7 +21,7 @@ function Navigaion() {
           // },
           headerTitle:'Đăng nhập'
         }} />
-        <Stack.Screen name='ManageOrder' title={'Thêm order'} component={ManageOrder}
+        <Stack.Screen name='ManageOrder' title={'Thêm order'} component={ManageOrderNew}
          options={{
           headerShown:false,
           // header: ({ scene }) => {

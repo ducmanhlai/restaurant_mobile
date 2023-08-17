@@ -47,7 +47,7 @@ const listOrder = (state = [], action) => {
     case 'REMOVE_ORDER':
       return []
     default:
-      return [];
+      return [...state];
   }
 };
 

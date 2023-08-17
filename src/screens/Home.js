@@ -38,6 +38,7 @@ function HomeScreen(props) {
         console.log(data)
       })
     });
+    
     socket.on('createOrder', data => {
       dispatch({ type: 'ADD_ORDER', data: data.order })
     })
@@ -90,8 +91,6 @@ function HomeScreen(props) {
         barStyle={'default'}
         hidden={false}
       />
-
-
     </LinearGradient>
   );
   function flatListOrder() {
