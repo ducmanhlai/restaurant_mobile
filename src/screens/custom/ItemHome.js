@@ -21,7 +21,7 @@ function ItemHome(props) {
   for (let i of item.detail) {
     total += i.status != 3 ? i.price * i.quantity : 0;
   }
-  const listStatus = ['Đã nhận', 'Đã hoàn thành', 'Đã hủy', 'Đã than toán']
+  const listStatus = ['Đã nhận', 'Đã hoàn thành', 'Đã hủy', 'Đã thanh toán']
   let status = item.status - 1
   return (
     <Animatable.View style={styles.itemOrder}

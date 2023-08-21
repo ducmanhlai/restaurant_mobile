@@ -95,7 +95,7 @@ function NewHomeScreen(props) {
         >Danh sách đơn</Animatable.Text>
       </View>
       {
-        listOrder.length > 0 ? flatListOrder() : <View style={{ height: '100%', alignItems: 'center', justifyContent: 'center' }}><Text>Chưa có gì</Text></View>
+        flatListOrder() 
       }
       <StatusBar
         animated={true}
@@ -120,10 +120,11 @@ function NewHomeScreen(props) {
     })
   }
   function flatListOrder() {
-    console.log('call')
+  
     return (
       <FlatList
-        style={{ height: '100%' }}
+        style={{ height: '100%'}}
+        contentContainerStyle={{ paddingBottom: 80,justifyContent:'center',alignItems:'center',width:'100%' }}
         data={listTable}
         numColumns={2}
         renderItem={({ index, item }) => <ItemTable item={item} navigation={navigation}/>
