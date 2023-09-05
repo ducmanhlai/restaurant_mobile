@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, ToastAndroid, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, ToastAndroid, StyleSheet, FlatList, TouchableOpacity, Alert, StatusBar, Image } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { connect } from 'react-redux';
@@ -7,25 +7,29 @@ import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid';
 import io from 'socket.io-client';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import LinearGradient from 'react-native-linear-gradient';
+import * as Animatable from 'react-native-animatable';
 import baseURL from '../services/const';
 import axios from '../services/axios';
-import { compareByStatus, compareByTime } from '../common';
-import ItemHome from './custom/ItemHome';
+import ItemTable from './custom/ItemTable';
+
 function NewHomeScreen(props) {
   const navigation = props.navigation
   const accesstoken = props.accesstoken;
   const user = props.user;
   const role = 3
-  const listOrder = props.listOrder;
-  const listTable = [];
-  
-  const sts = 1;
+  const listOrder = props.listOrder|| [];
+  const [listTable, setListTable] = useState([]);
+  const [tableTmp, setTableTmp] = useState([])
+  var sts = 1;
   const dispatch = useDispatch();
   useEffect(() => {
     // getUser()
     (async () => {
       const data = (await axios.get('/api/v1/food/get')).data.data
       dispatch({ type: 'INIT_LIST_FOOD', data: data })
+      const list= (await axios.get('/api/v1/table/get')).data.data
+      setTableTmp([...list])
     })().catch(err => {
       console.log(err)
     })
@@ -35,36 +39,71 @@ function NewHomeScreen(props) {
       socket.on('err', (err) => {
         ToastAndroid.show('Lỗi')
       })
-      socket.on('authenticate', data => {
-        console.log(data)
-      })
+      //   socket.on('authenticate', data => {
+      //     console.log(data)
+      //   })
     });
     socket.on('createOrder', data => {
+      socket.emit('getListOrder');
       dispatch({ type: 'ADD_ORDER', data: data.order })
     })
     socket.emit('getListOrder')
     socket.on('getListOrder', data => {
+      const list = []
+      tableTmp?.forEach(element => {
+        let [isHollow,idOrder,detail] =CheckInOrder(element.id,data)
+        list.push({
+          id: element.id,
+          name: element.name,
+          isHollow: isHollow,
+          idOrder: idOrder,
+          detail:detail
+        })
+      });
+      setListTable([...list])
       dispatch({ type: 'INIT_ORDER', data: data })
     })
     return () => {
       socket.disconnect()
     }
-  }, [sts])
+  }, [tableTmp.length])
   return (
-    (role == 3 ?
-      <View style={{ padding: 10 }}>
-        {
-          listOrder.length > 0 ? flatListOrder() : <View><Text>Rỗng</Text></View>
-        }
-        <View style={{ position: 'absolute', right: 10, top: 700 }}>
-          <TouchableOpacity style={styles.btnAdd} onPress={() => navigation.navigate('ManageOrder')}>
-            <Icon name="plus" size={40} color="white" />
-          </TouchableOpacity>
-        </View>
+    <LinearGradient colors={['#0693e3', '#fff']} style={styles.linearGradient}
+      start={{ x: 0.0, y: 0 }} end={{ x: 1, y: 0.75 }}
+    >
+      <View style={{
+        flexDirection: 'row',
+        borderBottomColor: '#ccc',
+        borderBottomWidth: 0.5,
+        marginBottom: 5,
+      }}>
+        <Animatable.Image source={{
+          uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw_DHz4baaRqCuAK145KvHH_xfHXUfDwxzsA&usqp=CAU'
+        }} animation={'slideInDown'}
+          duration={500}
+          style={[{ height: 30, width: 30, borderRadius: 80, marginBottom: 'auto', marginTop: 'auto', marginRight: 8 }]}
+        ></Animatable.Image>
+        <Animatable.Text
+          animation={'fadeIn'}
+          duration={2000}
+          style={{
+            fontSize: 22,
+            color: '#fff',
+            fontWeight: '500', textTransform: 'uppercase', textAlign: 'center', marginTop: 20,
+            marginBottom: 16,
+          }}
+        >Danh sách đơn</Animatable.Text>
       </View>
-      : <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Bếp</Text>
-      </View>)
+      {
+        flatListOrder() 
+      }
+      <StatusBar
+        animated={true}
+        backgroundColor="#0693e3"
+        barStyle={'default'}
+        hidden={false}
+      />
+    </LinearGradient>
   );
   function getUser() {
     (async () => {
@@ -81,18 +120,26 @@ function NewHomeScreen(props) {
     })
   }
   function flatListOrder() {
+  
     return (
       <FlatList
-        style={{ height: '100%' }}
-        data={listOrder.filter(item=>{
-          return item.status!=4
-        }).sort(compareByStatus).sort(compareByTime)}
-        renderItem={({ index, item }) => <ItemHome item={item} navigation= {navigation}/>
+        style={{ height: '100%'}}
+        contentContainerStyle={{ paddingBottom: 80,justifyContent:'center',alignItems:'center',width:'100%' }}
+        data={listTable}
+        numColumns={2}
+        renderItem={({ index, item }) => <ItemTable item={item} navigation={navigation}/>
         }
-        keyExtractor={({item,index}) => uuidv4()}
+        keyExtractor={({ item, index }) => uuidv4()}
       />
     )
   }
+}
+function CheckInOrder(id,listOrder) {
+  for (let i of listOrder) {
+    if (i.table == id && i.status < 3)
+      return [true,i.id,i.detail]
+  }
+  return [false,0,[]]
 }
 const styles = StyleSheet.create({
   itemOrder: {

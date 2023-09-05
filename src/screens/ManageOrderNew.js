@@ -29,11 +29,9 @@ function ManageOrder(props) {
     const user = props.user;
     const navigation = props.navigation;
     const order = props.route.params?.order || null;
-    const [listTable, setListTable] = useState([])
-    const [listTypeFood, setListTypeFood] = useState([])
     const [id_staff, setId_staff] = useState(1);
     const [listFood, setListFood] = useState([])
-    const [table, setTable] = useState(1);
+    const [table, setTable] = useState(order?.id || 0);
     const [typeFood, setTypeFood] = useState(0);
     const [note, setNote] = useState('');
     const [listDetail, setListDetail] = useState();
@@ -53,17 +51,7 @@ function ManageOrder(props) {
 
         (async () => {
             getListFood();
-            const data = (await axios.get('/api/v1/table/get')).data.data;
-            let maxId = data[0].id;
-            data.forEach(element => {
-                if (element.id > maxId)
-                    maxId = element.id
-            });
-            let listTmp = []
-            for (let i = 1; i <= maxId; i++) {
-                listTmp = [{ label: `Bàn số ${i}`, value: i }, ...listTmp]
-            }
-            setListTable([...listTmp])
+          
         })().finally(() => {
             setLoading(!loading)
         })
@@ -88,18 +76,19 @@ function ManageOrder(props) {
             ref={drawer}
             drawerWidth={300}
             drawerPosition={'right'}
-            renderNavigationView={navigationView}>
+            renderNavigationView={navigationView}
+            >
             <SafeAreaView style={{ height: '100%' }}>
                 <LinearGradient colors={['#0693e3', '#fff']} style={styles.linearGradient}
                     start={{ x: 0.0, y: 0 }} end={{ x: 1, y: 0.75 }}>
                     <AnimatedLoader
-                    source={require("../animation/animation_ll2in0tu.json")}
-                    visible={loading}
-                    overlayColor="rgba(255,255,255,0.75)"
-                    animationStyle={styles.lottie}
-                    speed={1}>
-                    <Text>Đang tải...</Text>
-                </AnimatedLoader>
+                        source={require("../animation/animation_ll2in0tu.json")}
+                        visible={loading}
+                        overlayColor="rgba(255,255,255,0.75)"
+                        animationStyle={styles.lottie}
+                        speed={1}>
+                        <Text>Đang tải...</Text>
+                    </AnimatedLoader>
                     <View style={{
                         flexDirection: 'row',
                         borderBottomColor: '#ccc',
@@ -126,20 +115,7 @@ function ManageOrder(props) {
                         <TouchableOpacity style={{ marginLeft: 'auto', marginTop: 'auto', marginBottom: 'auto' }} onPress={() => drawer.current.openDrawer()}><Icon name="list-ul" size={20} color='black'></Icon></TouchableOpacity>
                     </View>
                     <View style={{ flexDirection: 'row', width: '30%', marginTop: 10, marginLeft: 'auto', marginRight: 'auto' }}>
-                        <DropDownPicker
-                            placeholder={table == 0 ? 'Chọn bàn' : `Bàn ${table}`}
-                            setOpen={() => { setOpenTable(!openTable) }}
-                            multiple={false}
-                            items={listTable}
-                            open={openTable}
-                            setValue={setTable}
-                            placeholderStyle={{
-                                color: "grey",
-                                textAlign: 'center',
-                                fontWeight: "bold"
-                            }}
-                            style={{ width: '100%' }}
-                        />
+                       <Text>Bàn số {table}</Text>
                     </View>
                     <View>
                         {/* {noteVisible && (
@@ -150,7 +126,7 @@ function ManageOrder(props) {
                         )} */}
                         {listFood.length > 0 ? renderListFood() : <View><Text>Đang tải</Text></View>}
                     </View>
-                  
+
                     <View style={{ flexDirection: 'column', alignItems: 'center', flex: 1, width: '100%' }}>
                         <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
                             <TextInput
@@ -249,7 +225,7 @@ function ManageOrder(props) {
     }
     function handleOrder() {
         let data = {
-            id: order != null ? order.id : null,
+            id: order.idOrder!=0 ? order.idOrder : null,
             table: table,
             id_staff: user.id,
             note: note,
@@ -262,7 +238,7 @@ function ManageOrder(props) {
                 }
             })]
         }
-        if (order != null) {
+        if (order.idOrder!=0) {
             socket.emit('updateOrderDetail', data)
             navigation.navigate('Home')
         }
